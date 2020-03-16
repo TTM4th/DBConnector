@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DBConnector.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ConnectionString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">data source=(LocalDB)\MSSQLLocalDB;attachdbfilename=C:\Users\omant\MonetaryManagement.mdf;integrated security=True;connect timeout=30;MultipleActiveResultSets=True;</Value>
+    </Setting>
+    <Setting Name="Provider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">System.Data.SqlClient</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
