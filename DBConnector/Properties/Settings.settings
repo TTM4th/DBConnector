@@ -8,5 +8,8 @@
     <Setting Name="Provider" Type="System.String" Scope="User">
       <Value Profile="(Default)">System.Data.SqlClient</Value>
     </Setting>
+    <Setting Name="CreateTableSProcedure" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CreateMonthlyTable</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

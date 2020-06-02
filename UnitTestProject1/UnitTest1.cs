@@ -16,5 +16,20 @@ namespace UnitTestProject1
                 Console.WriteLine($"{data.ID}|{data.Date}|{data.Price}|{data.Classification}");
             }
         }
+
+        [TestMethod]
+        public void TableExistCheck()
+        {
+            var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
+            Console.WriteLine($"Is Exist Table ? ANS={testObj.IsExistMonetaryTable("20_6")}");
+        }
+
+        [TestMethod]
+        public void CreateTable()
+        {
+            var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
+            testObj.CreateTable("20_6");
+        }
+
     }
 }

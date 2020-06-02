@@ -50,6 +50,8 @@ namespace DBConnector.Accessor
             Connection.Close();
         }
 
+
+        //undone:更新ロジック
     }
 
 }
