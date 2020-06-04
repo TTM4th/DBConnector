@@ -82,7 +82,7 @@ namespace DBConnector.Controller
             if (IsExistMonetaryTable(tableName) == false) { return; }
             ConnectionClosure(() =>
                 {
-                    SqlCommand command = new SqlCommand($"TRUNCATE TABLE {tableName} ", Connection);
+                    SqlCommand command = new SqlCommand($"TRUNCATE TABLE [dbo].[{tableName}] ", Connection);
                     command.ExecuteNonQuery();
                 }
             );

@@ -61,7 +61,7 @@ namespace DBConnector.Accessor
             using (SqlBulkCopy bulkCopy = new SqlBulkCopy(Connection))
             {
                 bulkCopy.BulkCopyTimeout = 600;
-                bulkCopy.DestinationTableName = TableName;
+                bulkCopy.DestinationTableName = $"[{TableName}]";
                 bulkCopy.WriteToServer(ToDataTable(moneyUsedData));
             }
             Connection.Close();

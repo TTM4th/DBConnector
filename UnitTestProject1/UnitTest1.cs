@@ -33,9 +33,16 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
+        public void InitializeTable()
+        {
+            var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
+            testObj.InitializeTable("20_6");
+        }
+
+        [TestMethod]
         public void UpdateTable()
         {
-            string tableName = "TEST";
+            string tableName = "20_6";
             var testObj = new DBConnector.Accessor.MoneyUsedDataAccessor(tableName);
             var testManger = new DBConnector.Controller.MoneyUsedDataTableManager();
 
