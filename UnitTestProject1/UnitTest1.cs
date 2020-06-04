@@ -10,7 +10,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void GetMoneyTableData()
         {
-            var testObj = new DBConnector.Accessor.MoneyUsedDataAccessor("19_1");
+            var testObj = new DBConnector.Accessor.MoneyUsedDataAccessor("2020-06");
             testObj.GetMonetarydata();
             foreach(DBConnector.Entity.MoneyUsedData data in testObj.MoneyUsedDataEntitiesFromTable)
             {
@@ -22,27 +22,27 @@ namespace UnitTestProject1
         public void TableExistCheck()
         {
             var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
-            Console.WriteLine($"Is Exist Table ? ANS={testObj.IsExistMonetaryTable("20_6")}");
+            Console.WriteLine($"Is Exist Table ? ANS={testObj.IsExistMonetaryTable("2020-06")}");
         }
 
         [TestMethod]
         public void CreateTable()
         {
             var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
-            testObj.CreateTable("20_6");
+            testObj.CreateTable("2020-06");
         }
 
         [TestMethod]
         public void InitializeTable()
         {
             var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
-            testObj.InitializeTable("20_6");
+            testObj.InitializeTable("2020-06");
         }
 
         [TestMethod]
         public void UpdateTable()
         {
-            string tableName = "20_6";
+            string tableName = "TEST";
             var testObj = new DBConnector.Accessor.MoneyUsedDataAccessor(tableName);
             var testManger = new DBConnector.Controller.MoneyUsedDataTableManager();
 
