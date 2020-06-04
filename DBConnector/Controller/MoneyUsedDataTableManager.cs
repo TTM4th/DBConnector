@@ -10,6 +10,7 @@ namespace DBConnector.Controller
 {
     public class MoneyUsedDataTableManager
     {
+
         /// <summary>
         /// 接続用Connectionオブジェクト
         /// </summary>
@@ -20,19 +21,23 @@ namespace DBConnector.Controller
         /// </summary>
         private enum IsExistTable{NotExist,Exist}
 
+
         /// <summary>
         /// 引数で渡した処理をConnection接続→引数で渡した処理→接続解除の順で行うクロージャ
         /// </summary>
-        private Action<Action> ConnectionClosure;
+        protected Action<Action> ConnectionClosure;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public MoneyUsedDataTableManager()
         {
-            Connection = new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
-            ConnectionClosure = (Action action) => { Connection.Open(); action(); Connection.Close(); };
+            ConnectionClosure = (Action action) => {
+                Connection = new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
+                Connection.Open(); action(); Connection.Close();
+            };
         }
+
 
         /// <summary>
         /// テーブルが存在するか確認する
