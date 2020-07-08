@@ -60,5 +60,17 @@ namespace DBConnector.Properties {
                 this["CreateTableSProcedure"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GetAllTableNames")]
+        public string GetAllTableNames {
+            get {
+                return ((string)(this["GetAllTableNames"]));
+            }
+            set {
+                this["GetAllTableNames"] = value;
+            }
+        }
     }
 }

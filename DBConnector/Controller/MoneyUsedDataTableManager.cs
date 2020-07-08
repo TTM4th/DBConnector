@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
 
@@ -87,6 +85,27 @@ namespace DBConnector.Controller
                 }
             );
        }
+
+        /// <summary>
+        /// 月別利用額テーブル名を降順で一括取得する
+        /// </summary>
+        /// <returns></returns>
+        public IReadOnlyList<string> MonthlyTableNames()
+        {
+            DataTable dataTable = new DataTable();
+            const int firstColumnIndex = 0;
+            ConnectionClosure( () =>
+                {
+                    SqlCommand command = new SqlCommand(Properties.Settings.Default.GetAllTableNames, Connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataTable);
+                    adapter.Dispose();
+                    command.Dispose();
+                }
+            );
+            return dataTable.Rows.OfType<DataRow>().Select(x=>x.Field<string>(firstColumnIndex)).Where(x => x.Contains("-")).OrderByDescending(name => name).ToList();
+        }
 
     }
 }

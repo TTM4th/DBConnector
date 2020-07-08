@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
 using DBConnector.Entity;
-using System.ComponentModel;
 
 namespace DBConnector.Accessor
 {
@@ -98,6 +95,33 @@ namespace DBConnector.Accessor
             }
             return table;
         }
+
+        /// <summary>
+        /// 月単位の合計利用金額を取得する
+        /// </summary>
+        /// <param name="year">取得したい年</param>
+        /// <param name="month">取得したい月</param>
+        /// <returns></returns>
+        public static decimal GetMonthlyPrice(int year,int month)
+        {
+            string getMonthlySumProcedureName ="ReturnSumMonthlyPrice";
+            string outputParamName = "@Result";
+            string storedParamName1="@targetYear";
+            string storedParamName2 ="@targetMonth";
+
+            SqlConnection connection = new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
+            connection.Open();
+            SqlCommand command = new SqlCommand(getMonthlySumProcedureName, connection){ CommandType = CommandType.StoredProcedure};
+            command.Parameters.AddWithValue(storedParamName1, year);
+            command.Parameters.AddWithValue(storedParamName2, month);
+            command.Parameters.Add(outputParamName, SqlDbType.Decimal);
+            command.Parameters[outputParamName].Direction = ParameterDirection.Output;
+            command.ExecuteNonQuery();
+            decimal gotBalance = Convert.ToDecimal(command.Parameters[outputParamName].Value);
+            connection.Close();
+            return gotBalance;
+        }
+
     }
 
 }

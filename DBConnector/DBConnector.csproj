@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Accessor\MoneyUsedDataAccessor.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="Accessor\MonthlyFundAccessor.cs" />
     <Compile Include="Controller\MoneyUsedDataTableManager.cs" />
     <Compile Include="Entity\MoneyUsedData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -61,7 +61,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CreateTableProcedure.sql" />
+    <Content Include="CreateMonthlyTable.sql" />
+    <Content Include="GetAllTableNames.sql" />
+    <Content Include="GetMonthFirstBalance.sql" />
+    <Content Include="InsertMonthlyFirstBalance.sql" />
+    <Content Include="IsExistBalance.sql" />
+    <Content Include="IsExistMonthlyMonetaryTable.sql" />
+    <Content Include="ReturnSumMonthlyPrice.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -11,5 +11,8 @@
     <Setting Name="CreateTableSProcedure" Type="System.String" Scope="User">
       <Value Profile="(Default)">CreateMonthlyTable</Value>
     </Setting>
+    <Setting Name="GetAllTableNames" Type="System.String" Scope="User">
+      <Value Profile="(Default)">GetAllTableNames</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
