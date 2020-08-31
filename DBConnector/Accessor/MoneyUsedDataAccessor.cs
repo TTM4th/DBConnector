@@ -117,7 +117,7 @@ namespace DBConnector.Accessor
             command.Parameters.Add(outputParamName, SqlDbType.Decimal);
             command.Parameters[outputParamName].Direction = ParameterDirection.Output;
             command.ExecuteNonQuery();
-            decimal gotBalance = Convert.ToDecimal(command.Parameters[outputParamName].Value);
+            decimal gotBalance = DBNull.Value.Equals(command.Parameters[outputParamName].Value) ? 0 : (decimal)command.Parameters[outputParamName].Value;
             connection.Close();
             return gotBalance;
         }
