@@ -7,7 +7,7 @@ namespace UnitTestProject1
     [TestClass]
     public class UnitTest1
     {
-        [TestMethod]
+        [TestMethod]//月別利用額データの取得テスト
         public void GetMoneyTableData()
         {
             var testObj = new DBConnector.Accessor.MoneyUsedDataAccessor("2020-06");
@@ -18,28 +18,39 @@ namespace UnitTestProject1
             }
         }
 
-        [TestMethod]
+        [TestMethod]//テーブル存在確認メソッドの動作テスト
         public void TableExistCheck()
         {
             var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
-            Console.WriteLine($"Is Exist Table ? ANS={testObj.IsExistMonetaryTable("2020-06")}");
+            Console.WriteLine($"Is Exist Table ? ANS={testObj.IsExistMonetaryTable("TEST")}");
         }
 
-        [TestMethod]
+        [TestMethod]//DB上にある月別利用額テーブル名の取得テスト
+        public void GetMonthlyTableNameTest()
+        {
+            var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
+            var names = testObj.MonthlyTableNames();
+            foreach(string name in names)
+            {
+                Console.WriteLine($"{name}");
+            }
+        }
+
+        [TestMethod]//月別利用額テーブルの作成テスト
         public void CreateTable()
         {
             var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
-            testObj.CreateTable("2020-06");
+            testObj.CreateTable("TEST");
         }
 
-        [TestMethod]
+        [TestMethod]//月別利用額テーブルの消去テスト
         public void InitializeTable()
         {
             var testObj = new DBConnector.Controller.MoneyUsedDataTableManager();
-            testObj.InitializeTable("2020-06");
+            testObj.InitializeTable("TEST");
         }
 
-        [TestMethod]
+        [TestMethod]//月別利用額テーブルのデータ挿入更新テスト
         public void UpdateTable()
         {
             string tableName = "TEST";
@@ -61,5 +72,19 @@ namespace UnitTestProject1
             }
 
         }
+
+        [TestMethod]//月単位の合計利用金額を取得するテスト
+        public void GetMontlySumTEST()
+        {
+            Console.WriteLine(DBConnector.Accessor.MoneyUsedDataAccessor.GetMonthlyPrice(2021, 04));
+        }
+
+        [TestMethod]//月単位の残額を取得するテスト
+        public void GetMontlyBalanceTEST()
+        {
+            var obj = new DBConnector.Accessor.MonthlyFundAccessor();
+            Console.WriteLine(obj.GetMonthFirstBalance(2021, 04));
+        }
+
     }
 }

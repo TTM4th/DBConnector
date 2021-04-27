@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 
 namespace DBConnector.Accessor
 {
@@ -13,32 +13,12 @@ namespace DBConnector.Accessor
         /// <summary>
         /// 接続用Connectionオブジェクト
         /// </summary>
-        private SqlConnection Connection;
+        private SQLiteConnection Connection;
 
         /// <summary>
         /// 月別月初残高テーブル名
         /// </summary>
         private string TableName { get { return "MonthlyFund"; } }
-
-        /// <summary>
-        /// 月初残額取得ストアドプロシージャ名
-        /// </summary>
-        private string GetBalanceProcedureName { get { return "GetMonthFirstBalance"; } }
-
-        /// <summary>
-        /// GetMonthFirstBalanceプロシージャの第3引数名(OUTPUTパラメータ)
-        /// </summary>
-        private string OutputParamName { get { return "@Result"; } }
-
-        /// <summary>
-        /// GetMonthFirstBalanceプロシージャの第1引数名
-        /// </summary>
-        private string StoredParamName1 { get { return "@targetYear"; } }
-
-        /// <summary>
-        /// GetMonthFirstBalanceプロシージャの第2引数名
-        /// </summary>
-        private string StoredParamName2 { get { return "@targetMonth"; } }
 
         # endregion
 
@@ -55,19 +35,44 @@ namespace DBConnector.Accessor
         /// <returns></returns>
         public decimal GetMonthFirstBalance(int year,int month)
         {
-                Connection = new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
-                Connection.Open();
-                SqlCommand command = new SqlCommand(GetBalanceProcedureName,Connection);
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.Parameters.AddWithValue(StoredParamName1, year);
-                command.Parameters.AddWithValue(StoredParamName2, month);
-                command.Parameters.Add(OutputParamName, System.Data.SqlDbType.Decimal);
-                command.Parameters[OutputParamName].Direction = System.Data.ParameterDirection.Output;
+            decimal gotBalance;
+            Connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
+            Connection.Open();
+            //SqlCommand command = new SqlCommand(GetBalanceProcedureName,Connection);
+            SQLiteCommand command = new SQLiteCommand(Connection);
+            command.CommandText = "SELECT COUNT([Price]) " +
+                                    "FROM [MonthlyFund] " +
+                                    $"WHERE [Year] = {year} " +
+                                    $"AND[Month] = {month} " +
+                                    "ORDER BY [MonthlyFund].ID DESC";
+            if (Convert.ToInt32(command.ExecuteScalar()) == 0)
+            {
+                var pickedDate = new DateTime(year, month, 1);//初日を想定しているので１日には月を入れている
+                pickedDate.AddMonths(-1);
+                command.CommandText = "SELECT [Price] "+
+                                        "FROM [MonthlyFund] "+
+                                        $"WHERE[Year] = {pickedDate.Year} "+
+                                        $"AND[Month] = {pickedDate.Month} "+
+                                        "ORDER BY [MonthlyFund].ID DESC LIMIT 1";
+                decimal prevBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
+                decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.Year, pickedDate.Month);
+                gotBalance = newBalance;
+                command.CommandText = $"INSERT INTO [MonthlyFund]([Year],[Month],[Price]) VALUES ({year},{month},{newBalance})";
                 command.ExecuteNonQuery();
-                decimal gotBalance = Convert.ToDecimal(command.Parameters[OutputParamName].Value);
-                Connection.Close();
-                return gotBalance;
+            }
+            else { 
+            command.CommandText= "SELECT [Price] " +
+                                    "FROM [MonthlyFund] " +
+                                    $"WHERE [Year] = {year} " +
+                                    $"AND[Month] = {month} " +
+                                    "ORDER BY [MonthlyFund].ID DESC LIMIT 1";
+            gotBalance = Convert.ToDecimal(command.ExecuteScalar());
+            Connection.Close();
+            }
+            return gotBalance;
         }
+
+
 
     }
 }

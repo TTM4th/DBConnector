@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data.SqlClient;
 using System.Data;
+using System.Data.SQLite;
 
 namespace DBConnector.Controller
 {
@@ -12,12 +13,7 @@ namespace DBConnector.Controller
         /// <summary>
         /// 接続用Connectionオブジェクト
         /// </summary>
-        private SqlConnection Connection;
-
-        /// <summary>
-        /// テーブル存在有無フラグ列挙体
-        /// </summary>
-        private enum IsExistTable{NotExist,Exist}
+        private SQLiteConnection Connection;
 
 
         /// <summary>
@@ -31,7 +27,7 @@ namespace DBConnector.Controller
         public MoneyUsedDataTableManager()
         {
             ConnectionClosure = (Action action) => {
-                Connection = new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
+                Connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
                 Connection.Open(); action(); Connection.Close();
             };
         }
@@ -44,14 +40,15 @@ namespace DBConnector.Controller
         /// <returns></returns>
         public bool IsExistMonetaryTable(string tableName)
         {
-            bool isExist=false;
+            var isExisttablecount=0;
             ConnectionClosure( () =>
                 {
-                    SqlCommand SelectCommand = new SqlCommand($"IF OBJECT_ID(N'[{tableName}]', N'U') IS NULL SELECT {(int)IsExistTable.NotExist} ELSE SELECT {(int)IsExistTable.Exist}", Connection);
-                    isExist = (IsExistTable)SelectCommand.ExecuteScalar() == IsExistTable.Exist;
+                    SQLiteCommand SelectCommand = new SQLiteCommand($"SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND name='{tableName}'", Connection);
+                    isExisttablecount = Convert.ToInt32(SelectCommand.ExecuteScalar());
                 }
             );
-            return isExist;
+            if (isExisttablecount != 0) return true;
+            else return false;
         }
 
         /// <summary>
@@ -62,9 +59,9 @@ namespace DBConnector.Controller
         {
             ConnectionClosure(() => 
                 {
-                    SqlCommand command = new SqlCommand(Properties.Settings.Default.CreateTableSProcedure, Connection);
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.Add(new SqlParameter("@TableName", tableName));
+                    SQLiteCommand command = new SQLiteCommand(Connection);
+                    command.CommandText= $"CREATE TABLE [{tableName}] (ID int IDENTITY(1,1) NOT NULL,"+
+                                         "[Date] date,Price decimal(28, 0),Classification char(1))";
                     command.ExecuteNonQuery();
                 }
             );
@@ -80,7 +77,9 @@ namespace DBConnector.Controller
             if (IsExistMonetaryTable(tableName) == false) { return; }
             ConnectionClosure(() =>
                 {
-                    SqlCommand command = new SqlCommand($"TRUNCATE TABLE [dbo].[{tableName}] ", Connection);
+                    SQLiteCommand command = new SQLiteCommand($"DELETE FROM [{tableName}] ", Connection);
+                    command.ExecuteNonQuery();
+                    command = new SQLiteCommand($"VACUUM", Connection);
                     command.ExecuteNonQuery();
                 }
             );
@@ -96,9 +95,8 @@ namespace DBConnector.Controller
             const int firstColumnIndex = 0;
             ConnectionClosure( () =>
                 {
-                    SqlCommand command = new SqlCommand(Properties.Settings.Default.GetAllTableNames, Connection);
-                    command.CommandType = CommandType.StoredProcedure;
-                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    SQLiteCommand command = new SQLiteCommand("SELECT NAME FROM sqlite_master WHERE TYPE = 'table'", Connection);
+                    SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
                     adapter.Fill(dataTable);
                     adapter.Dispose();
                     command.Dispose();

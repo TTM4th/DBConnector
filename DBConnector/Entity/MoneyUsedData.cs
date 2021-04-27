@@ -19,7 +19,7 @@ namespace DBConnector.Entity
         /// <param name="row"></param>
         public MoneyUsedData(System.Data.DataRow row)
         {
-            ID = (int)row[nameof(ID)];
+            ID = Convert.ToInt32(row[nameof(ID)]);
             var rawdate = (DateTime)row[nameof(Date)];
             Date = rawdate.ToShortDateString();
             Price = (decimal)row[nameof(Price)];

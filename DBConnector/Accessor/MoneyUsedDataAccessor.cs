@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data.SqlClient;
 using System.Data;
 using DBConnector.Entity;
+using System.Data.SQLite;
 
 namespace DBConnector.Accessor
 {
@@ -13,7 +13,7 @@ namespace DBConnector.Accessor
         /// <summary>
         /// 接続用Connectionオブジェクト
         /// </summary>
-        private SqlConnection Connection;
+        private SQLiteConnection Connection;
 
         /// <summary>
         /// 接続したいテーブル名
@@ -36,9 +36,9 @@ namespace DBConnector.Accessor
         /// </summary>
         public void GetMonetarydata()
         {
-            Connection=new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
+            Connection=new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
             Connection.Open();
-            SqlDataAdapter adapter = new SqlDataAdapter { SelectCommand = new SqlCommand($"SELECT * FROM [dbo].[{TableName}]", Connection) };
+            var adapter = new SQLiteDataAdapter { SelectCommand = new SQLiteCommand($"SELECT * FROM [{TableName}]", Connection) };
             var dataSet=new DataSet();
             adapter.Fill(dataSet);
             MoneyUsedDataEntitiesFromTable = dataSet.Tables.OfType<DataTable>().Single()
@@ -53,47 +53,46 @@ namespace DBConnector.Accessor
         /// <param name="moneyUsedData">アップロードしたい金銭管理データ</param>
         public void UploadMonetaryData(IEnumerable<MoneyUsedData> moneyUsedData)
         {
-            Connection = new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
-            Connection.Open();
-            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(Connection))
+            Connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
+            
+
+            using (SQLiteCommand command = Connection.CreateCommand())
             {
-                bulkCopy.BulkCopyTimeout = 600;
-                bulkCopy.DestinationTableName = $"[{TableName}]";
-                bulkCopy.WriteToServer(ToDataTable(moneyUsedData));
+                SQLiteTransaction transaction = null;
+                try
+                {
+                    Connection.Open();
+                    transaction = Connection.BeginTransaction();
+                    command.CommandText = BuildReplaceQuery(moneyUsedData);
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                finally
+                {
+                    Connection.Close();
+                }
             }
-            Connection.Close();
         }
 
         /// <summary>
-        /// 引数で受け取った金銭管理データをDataTable形式にする
+        /// 引数で受け取った金銭管理データを
         /// </summary>
         /// <param name="data">変換したい金銭管理データ</param>
         /// <returns></returns>
-        internal static DataTable ToDataTable(IEnumerable<MoneyUsedData> data)
+        internal string BuildReplaceQuery(IEnumerable<MoneyUsedData> data)
         {
-            //var properties = TypeDescriptor.GetProperties(typeof(MoneyUsedData));
-            var table = new DataTable();
-            //項目変数プロパティに従った列とデータ型を設定する
-            table.Columns.Add(nameof(MoneyUsedData.ID), typeof(int));
-            table.Columns.Add(nameof(MoneyUsedData.Date), typeof(DateTime));
-            table.Columns.Add(nameof(MoneyUsedData.Price), typeof(decimal));
-            table.Columns.Add(nameof(MoneyUsedData.Classification), typeof(string));
-            //foreach (PropertyDescriptor prop in properties)
-            //{
-            //    table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
-            //}
+            string query = $"REPLACE INTO [{TableName}] VALUES ";
             //列とデータ型を設定したテーブルにデータを入れる
             foreach (MoneyUsedData item in data)
             {
-                var row = table.NewRow();
-                //foreach (PropertyDescriptor prop in properties){row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;}
-                row[nameof(MoneyUsedData.ID)] = item.ID;
-                row[nameof(MoneyUsedData.Date)] = DateTime.Parse(item.Date);
-                row[nameof(MoneyUsedData.Price)] = item.Price;
-                row[nameof(MoneyUsedData.Classification)] = item.Classification;
-                table.Rows.Add(row);
+                query += $"({item.ID},'{item.Date.Replace('/','-')}',{item.Price},'{item.Classification}'),";
             }
-            return table;
+            return query.TrimEnd(',');//最後の余分なカンマは消して返す。
         }
 
         /// <summary>
@@ -104,20 +103,13 @@ namespace DBConnector.Accessor
         /// <returns></returns>
         public static decimal GetMonthlyPrice(int year,int month)
         {
-            string getMonthlySumProcedureName ="ReturnSumMonthlyPrice";
-            string outputParamName = "@Result";
-            string storedParamName1="@targetYear";
-            string storedParamName2 ="@targetMonth";
 
-            SqlConnection connection = new SqlConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
+            var connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
             connection.Open();
-            SqlCommand command = new SqlCommand(getMonthlySumProcedureName, connection){ CommandType = CommandType.StoredProcedure};
-            command.Parameters.AddWithValue(storedParamName1, year);
-            command.Parameters.AddWithValue(storedParamName2, month);
-            command.Parameters.Add(outputParamName, SqlDbType.Decimal);
-            command.Parameters[outputParamName].Direction = ParameterDirection.Output;
+            var command = new SQLiteCommand(connection);
+            command.CommandText = $"SELECT SUM([Price]) FROM [{year}-{month.ToString("00")}]";
             command.ExecuteNonQuery();
-            decimal gotBalance = DBNull.Value.Equals(command.Parameters[outputParamName].Value) ? 0 : (decimal)command.Parameters[outputParamName].Value;
+            decimal gotBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
             connection.Close();
             return gotBalance;
         }

@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ConnectionString" Type="System.String" Scope="User">
-      <Value Profile="(Default)">data source=(LocalDB)\MSSQLLocalDB;attachdbfilename=C:\Users\omant\MonetaryManagement.mdf;integrated security=True;connect timeout=30;MultipleActiveResultSets=True;</Value>
+      <Value Profile="(Default)">Data Source=D:\Documents\出先用金銭管理アーカイブ\Backup\MonetaryManagement.db</Value>
     </Setting>
     <Setting Name="Provider" Type="System.String" Scope="User">
       <Value Profile="(Default)">System.Data.SqlClient</Value>
