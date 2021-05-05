@@ -25,7 +25,7 @@ namespace DBConnector.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=D:\\Documents\\出先用金銭管理アーカイブ\\Backup\\MonetaryManagement.db")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=.\\MonetaryManagement.db")]
         public string ConnectionString {
             get {
                 return ((string)(this["ConnectionString"]));
