@@ -48,14 +48,14 @@ namespace DBConnector.Accessor
             if (Convert.ToInt32(command.ExecuteScalar()) == 0)
             {
                 var pickedDate = new DateTime(year, month, 1);//初日を想定しているので１日には月を入れている
-                pickedDate.AddMonths(-1);
+                //pickedDate.AddMonths(-1);
                 command.CommandText = "SELECT [Price] "+
                                         "FROM [MonthlyFund] "+
                                         $"WHERE[Year] = {pickedDate.Year} "+
                                         $"AND[Month] = {pickedDate.Month} "+
                                         "ORDER BY [MonthlyFund].ID DESC LIMIT 1";
                 decimal prevBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
-                decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.Year, pickedDate.Month);
+                decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month);
                 gotBalance = newBalance;
                 command.CommandText = $"INSERT INTO [MonthlyFund]([Year],[Month],[Price]) VALUES ({year},{month},{newBalance})";
                 command.ExecuteNonQuery();
@@ -66,9 +66,9 @@ namespace DBConnector.Accessor
                                     $"WHERE [Year] = {year} " +
                                     $"AND[Month] = {month} " +
                                     "ORDER BY [MonthlyFund].ID DESC LIMIT 1";
+            }
             gotBalance = Convert.ToDecimal(command.ExecuteScalar());
             Connection.Close();
-            }
             return gotBalance;
         }
 
