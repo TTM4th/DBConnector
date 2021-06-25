@@ -66,8 +66,8 @@ namespace DBConnector.Accessor
                                     $"WHERE [Year] = {year} " +
                                     $"AND[Month] = {month} " +
                                     "ORDER BY [MonthlyFund].ID DESC LIMIT 1";
-            }
             gotBalance = Convert.ToDecimal(command.ExecuteScalar());
+            }
             Connection.Close();
             return gotBalance;
         }
