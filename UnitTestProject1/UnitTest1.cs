@@ -83,7 +83,14 @@ namespace UnitTestProject1
         public void GetMontlyBalanceTEST()
         {
             var obj = new DBConnector.Accessor.MonthlyFundAccessor();
-            Console.WriteLine(obj.GetMonthFirstBalance(2021, 05));
+            //月初日のデータが無い場合（前月の月別テーブルは存在する）
+            Console.WriteLine(obj.GetMonthFirstBalance(2020, 5));
+            //月初日のデータが無い場合（前月の月別テーブルと前月初日の残額情報はある）
+            Console.WriteLine(obj.GetMonthFirstBalance(2021, 5));
+            //月初日のデータがない場合（1か月前の月別テーブルと前月初日の残額情報が存在しない）
+            //※ここで2021-07のテーブルが自動生成される（内容は空）
+            Console.WriteLine(obj.GetMonthFirstBalance(2021, 8));
+            //2021-06-26 20:17テスト済み
         }
 
 

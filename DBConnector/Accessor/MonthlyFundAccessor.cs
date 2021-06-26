@@ -38,40 +38,102 @@ namespace DBConnector.Accessor
             decimal gotBalance;
             Connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
             Connection.Open();
-            //SqlCommand command = new SqlCommand(GetBalanceProcedureName,Connection);
+
+            //まずは指定した年月の月初残高の存在有無を確認する
             SQLiteCommand command = new SQLiteCommand(Connection);
-            command.CommandText = "SELECT COUNT([Price]) " +
-                                    "FROM [MonthlyFund] " +
-                                    $"WHERE [Year] = {year} " +
-                                    $"AND[Month] = {month} " +
-                                    "ORDER BY [MonthlyFund].ID DESC";
+            command.CommandText = BuildPickUpMonthlyFundQuery(year,month,false);
             if (Convert.ToInt32(command.ExecuteScalar()) == 0)
             {
-                var pickedDate = new DateTime(year, month, 1);//初日を想定しているので１日には月を入れている
-                //pickedDate.AddMonths(-1);
-                command.CommandText = "SELECT [Price] "+
-                                        "FROM [MonthlyFund] "+
-                                        $"WHERE[Year] = {pickedDate.Year} "+
-                                        $"AND[Month] = {pickedDate.Month} "+
-                                        "ORDER BY [MonthlyFund].ID DESC LIMIT 1";
-                decimal prevBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
-                decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month);
-                gotBalance = newBalance;
-                command.CommandText = $"INSERT INTO [MonthlyFund]([Year],[Month],[Price]) VALUES ({year},{month},{newBalance})";
-                command.ExecuteNonQuery();
+                InsertFromPreviousMonth(new DateTime(year, month,1),Connection);//初日を想定しているので日付には1日を入れている
             }
-            else { 
-            command.CommandText= "SELECT [Price] " +
-                                    "FROM [MonthlyFund] " +
-                                    $"WHERE [Year] = {year} " +
-                                    $"AND[Month] = {month} " +
-                                    "ORDER BY [MonthlyFund].ID DESC LIMIT 1";
+            
+            //月初日の残額を取得する
+            command.CommandText = BuildPickUpMonthlyFundQuery(year, month,true);
             gotBalance = Convert.ToDecimal(command.ExecuteScalar());
-            }
+            
             Connection.Close();
             return gotBalance;
         }
 
+        /// <summary>
+        /// 引数のDateTime構造体さかのぼって、前月の利用金額と前月の月初残額から引数の月初金額を計算して挿入する
+        /// </summary>
+        /// <param name="pickedDate">挿入したい年月のDateTime構造体</param>
+        /// <param name="connection">接続に利用しているconnectionオブジェクト</param>
+        private void InsertFromPreviousMonth(DateTime pickedDate,SQLiteConnection connection) {
+            SQLiteCommand command = new SQLiteCommand(connection);
+            command.CommandText = BuildPickUpMonthlyFundQuery(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month, true);
+            //前月の月初めの金額情報
+            decimal prevBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
+            decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month);
+            this.InsertMonthlyFundRecord(pickedDate.Year,pickedDate.Month,newBalance,connection);
+        }
+
+        /// <summary>
+        /// 月初日残額情報を引き出すクエリ文を作成する。
+        /// </summary>
+        /// <param name="year">引き出したい年（西暦）</param>
+        /// <param name="month">引き出したい月</param>
+        /// <param name="isSingle">引き出したいレコードは単一の場合はtrue,それ以外はfalse</param>
+        private string BuildPickUpMonthlyFundQuery(int year, int month, bool isSingle)
+        {
+            string returnQuery = "SELECT [Price] " +
+                                 "FROM [MonthlyFund] " +
+                                 $"WHERE [Year] = {year} " +
+                                 $"AND[Month] = {month} " +
+                                 $"ORDER BY [{TableName}].ID DESC";
+            if (isSingle) { return returnQuery + " LIMIT 1"; }
+            else { return returnQuery; }
+        }
+
+        /// <summary>
+        /// MonthlyFundに引数で指定した年月の初日の残額情報を挿入する
+        /// </summary>
+        /// <param name="year">指定する年月（西暦四ケタ）</param>
+        /// <param name="month">指定する月</param>
+        /// <param name="firstBalance">第1、第2引数で指定した年月に挿入する金額情報</param>
+        /// <param name="connection">接続に利用しているconnectionオブジェクト</param>
+        private void InsertMonthlyFundRecord(int year, int month, decimal firstBalance, SQLiteConnection connection)
+        {
+            SQLiteCommand command = new SQLiteCommand(connection)
+            {
+                CommandText = $"INSERT INTO [{TableName}]([Year],[Month],[Price]) VALUES ({year},{month},{firstBalance})"
+            };
+            command.ExecuteNonQuery();
+        }
+
+
+
+        ///// <summary>
+        ///// MonthlyFundに入っているレコードから一番最新の年と月を取得する
+        ///// </summary>
+        ///// <param name="connection">接続に利用しているconnectionオブジェクト</param>
+        ///// <returns>整数型の西暦四ケタ,月を取得する。初期状態の場合は両方とも０を返す</returns>
+        //private (int year,int month) PickUpMostRecentYearAndMonth(SQLiteConnection connection)
+        //{
+        //    SQLiteCommand command = new SQLiteCommand(connection)
+        //    {
+        //        CommandText = "SELECT MonthlyFund.Year,MonthlyFund.Month " +
+        //        "FROM MonthlyFund ORDER BY MonthlyFund.Year DESC,MonthlyFund.Month DESC LIMIT 1"
+        //    };
+
+        //    (int year, int month) returnTuple; 
+
+        //    SQLiteDataReader sdr = command.ExecuteReader();
+
+        //    if (sdr.HasRows) {
+        //        sdr.Read();
+        //        returnTuple = ((int)sdr["Year"], (int)sdr["Month"]);
+        //    }
+        //    else {
+        //        //初期状態で1行も存在していない場合
+        //        returnTuple=(0, 0);
+        //    }
+
+        //    sdr.Close();
+
+        //    return returnTuple;
+        //}
 
 
     }
