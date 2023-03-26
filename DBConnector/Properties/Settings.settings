@@ -5,14 +5,5 @@
     <Setting Name="ConnectionString" Type="System.String" Scope="User">
       <Value Profile="(Default)">Data Source=.\MonetaryManagement.db</Value>
     </Setting>
-    <Setting Name="Provider" Type="System.String" Scope="User">
-      <Value Profile="(Default)">System.Data.SqlClient</Value>
-    </Setting>
-    <Setting Name="CreateTableSProcedure" Type="System.String" Scope="User">
-      <Value Profile="(Default)">CreateMonthlyTable</Value>
-    </Setting>
-    <Setting Name="GetAllTableNames" Type="System.String" Scope="User">
-      <Value Profile="(Default)">GetAllTableNames</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

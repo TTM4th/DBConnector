@@ -99,15 +99,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CreateMonthlyTable.sql" />
-    <Content Include="GetAllTableNames.sql" />
-    <Content Include="GetMonthFirstBalance.sql" />
-    <Content Include="InsertMonthlyFirstBalance.sql" />
-    <Content Include="IsExistBalance.sql" />
-    <Content Include="IsExistMonthlyMonetaryTable.sql" />
-    <Content Include="ReturnSumMonthlyPrice.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

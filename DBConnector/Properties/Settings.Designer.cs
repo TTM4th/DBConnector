@@ -34,41 +34,5 @@ namespace DBConnector.Properties {
                 this["ConnectionString"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("System.Data.SqlClient")]
-        public string Provider {
-            get {
-                return ((string)(this["Provider"]));
-            }
-            set {
-                this["Provider"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CreateMonthlyTable")]
-        public string CreateTableSProcedure {
-            get {
-                return ((string)(this["CreateTableSProcedure"]));
-            }
-            set {
-                this["CreateTableSProcedure"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("GetAllTableNames")]
-        public string GetAllTableNames {
-            get {
-                return ((string)(this["GetAllTableNames"]));
-            }
-            set {
-                this["GetAllTableNames"] = value;
-            }
-        }
     }
 }
