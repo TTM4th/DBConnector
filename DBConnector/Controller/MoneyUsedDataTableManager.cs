@@ -129,12 +129,27 @@ namespace DBConnector.Controller
             {
                 SQLiteCommand command = new SQLiteCommand(Connection);
                 command.CommandText = $"SELECT SUM([Price]) FROM [{year}-{month}]";
-                command.ExecuteNonQuery();
-                gotBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
+                var result = command.ExecuteScalar();
+                gotBalance = DBNull.Value.Equals(result) ? 0 : Convert.ToDecimal(result);
             });
 
             return gotBalance;
         }
+
+        public bool IsInitialTable(string year, string month)
+        {
+            string name = $"{ year }-{ month}";
+            int resultcount = 0;
+            if (!this.IsExistMonetaryTable(name)){ return true; }
+            ConnectionClosure(() =>
+            {
+                SQLiteCommand command = new SQLiteCommand(Connection);
+                command.CommandText = $"SELECT COUNT(*) FROM [{name}]";
+                resultcount = Convert.ToInt32(command.ExecuteScalar());
+            });
+            return resultcount == 0;
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // 重複する呼び出しを検出するには
 

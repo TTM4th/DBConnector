@@ -98,7 +98,14 @@ namespace UnitTestProject1
             
             Console.WriteLine(obj.GetMonthFirstBalance(searchyear[0], searchyear[1]));
         }
-
+        [TestMethod]
+        public void InitTableTest()
+        {
+            var obj2 = new DBConnector.Controller.MoneyUsedDataTableManager();
+            var year = "2021";
+            var month = "08";
+            Console.WriteLine($"{year}-{month}:IsInitial = {obj2.IsInitialTable(year,month)}");
+        }
 
     }
 }
