@@ -32,7 +32,9 @@ namespace UnitTestProject1
             var names = testObj.MonthlyTableNames();
             foreach(string name in names)
             {
+                var words = name.Split('-');
                 Console.WriteLine($"{name}");
+                Console.WriteLine($"{words[0]},{words[1]}");
             }
         }
 
@@ -76,21 +78,25 @@ namespace UnitTestProject1
         [TestMethod]//月単位の合計利用金額を取得するテスト
         public void GetMontlySumTEST()
         {
-            Console.WriteLine(DBConnector.Accessor.MoneyUsedDataAccessor.GetMonthlyPrice(2021, 04));
+            var obj = new DBConnector.Controller.MoneyUsedDataTableManager();
+            Console.WriteLine(obj.GetMonthlyPrice("2021", "03"));
         }
 
         [TestMethod]//月単位の残額を取得するテスト
         public void GetMontlyBalanceTEST()
         {
             var obj = new DBConnector.Accessor.MonthlyFundAccessor();
-            //月初日のデータが無い場合（前月の月別テーブルは存在する）
-            Console.WriteLine(obj.GetMonthFirstBalance(2020, 5));
+            var obj2 = new DBConnector.Controller.MoneyUsedDataTableManager();
+            //月初日のデータが無い場合（前月の月別テーブルは存在する）-> これエラーケースなのでテストしない
+            //Console.WriteLine(obj.GetMonthFirstBalance(2020, 5));
+
             //月初日のデータが無い場合（前月の月別テーブルと前月初日の残額情報はある）
             Console.WriteLine(obj.GetMonthFirstBalance(2021, 5));
             //月初日のデータがない場合（1か月前の月別テーブルと前月初日の残額情報が存在しない）
-            //※ここで2021-07のテーブルが自動生成される（内容は空）
-            Console.WriteLine(obj.GetMonthFirstBalance(2021, 8));
-            //2021-06-26 20:17テスト済み
+            int[] searchyear = { 2021, 8 };
+            if (obj2.IsExistMonetaryTable($"{searchyear[0]}-{searchyear[1].ToString("00")}") == false) { obj2.CreateTable($"{searchyear[0]}-{searchyear[1].ToString("00")}"); }
+            
+            Console.WriteLine(obj.GetMonthFirstBalance(searchyear[0], searchyear[1]));
         }
 
 

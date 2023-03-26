@@ -7,7 +7,7 @@ using System.Data.SQLite;
 
 namespace DBConnector.Controller
 {
-    public class MoneyUsedDataTableManager:IDisposable
+    public class MoneyUsedDataTableManager : IDisposable
     {
 
         /// <summary>
@@ -40,12 +40,12 @@ namespace DBConnector.Controller
         /// <returns></returns>
         public bool IsExistMonetaryTable(string tableName)
         {
-            var isExisttablecount=0;
-            ConnectionClosure( () =>
-                {
-                    SQLiteCommand SelectCommand = new SQLiteCommand($"SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND name='{tableName}'", Connection);
-                    isExisttablecount = Convert.ToInt32(SelectCommand.ExecuteScalar());
-                }
+            var isExisttablecount = 0;
+            ConnectionClosure(() =>
+               {
+                   SQLiteCommand SelectCommand = new SQLiteCommand($"SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND name='{tableName}'", Connection);
+                   isExisttablecount = Convert.ToInt32(SelectCommand.ExecuteScalar());
+               }
             );
             if (isExisttablecount != 0) return true;
             else return false;
@@ -57,23 +57,23 @@ namespace DBConnector.Controller
         /// <param name="tableName"></param>
         public void CreateTable(string tableName)
         {
-            ConnectionClosure(() => 
+            ConnectionClosure(() =>
                 {
                     SQLiteCommand command = new SQLiteCommand(Connection);
-                    command.CommandText= $"CREATE TABLE [{tableName}] (ID int IDENTITY(1,1) NOT NULL,"+
+                    command.CommandText = $"CREATE TABLE [{tableName}] (ID int IDENTITY(1,1) NOT NULL," +
                                          "[Date] date,Price decimal(28, 0),Classification char(1))";
                     command.ExecuteNonQuery();
                 }
             );
         }
 
-       
+
         /// <summary>
         /// テーブルを初期化する
         /// </summary>
         /// <param name="tableName"></param>
-       public void InitializeTable(string tableName)
-       {
+        public void InitializeTable(string tableName)
+        {
             if (IsExistMonetaryTable(tableName) == false) { return; }
             ConnectionClosure(() =>
                 {
@@ -83,7 +83,7 @@ namespace DBConnector.Controller
                     command.ExecuteNonQuery();
                 }
             );
-       }
+        }
 
         /// <summary>
         /// 月別利用額テーブル名を降順で一括取得する
@@ -93,18 +93,49 @@ namespace DBConnector.Controller
         {
             DataTable dataTable = new DataTable();
             const int firstColumnIndex = 0;
-            ConnectionClosure( () =>
-                {
-                    SQLiteCommand command = new SQLiteCommand("SELECT NAME FROM sqlite_master WHERE TYPE = 'table'", Connection);
-                    SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
-                    adapter.Fill(dataTable);
-                    adapter.Dispose();
-                    command.Dispose();
-                }
+            ConnectionClosure(() =>
+               {
+                   SQLiteCommand command = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]'", Connection);
+                   SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+                   adapter.Fill(dataTable);
+                   adapter.Dispose();
+                   command.Dispose();
+               }
             );
-            return dataTable.Rows.OfType<DataRow>().Select(x=>x.Field<string>(firstColumnIndex)).Where(x => x.Contains("-")).OrderByDescending(name => name).ToList();
+            return dataTable.Rows.OfType<DataRow>().Select(x => x.Field<string>(firstColumnIndex)).OrderByDescending(name => name).ToList();
         }
 
+        /// <summary>
+        /// 最新年月のテーブルの月別利用総額を取得する
+        /// </summary>
+        /// <returns>最新年月テーブルの月別利用総額</returns>
+        public decimal LastMonthlySumPrice()
+        {
+            var yeardate = this.MonthlyTableNames().First<string>().Split('-');
+            return this.GetMonthlyPrice(yeardate[0], yeardate[1]);
+        }
+
+        /// <summary>
+        /// 月単位の合計利用金額を取得する。
+        /// ※引数で指定した年月の月別テーブルが無い場合は引数で指定した年月分の空のテーブルを作成してから月単位の合計金額を取得する。
+        /// </summary>
+        /// <param name="year">取得したい年</param>
+        /// <param name="month">取得したい月(2桁)</param>
+        /// <returns></returns>
+        public decimal GetMonthlyPrice(string year, string month)
+        {
+
+            decimal gotBalance = 0;
+            ConnectionClosure(() =>
+            {
+                SQLiteCommand command = new SQLiteCommand(Connection);
+                command.CommandText = $"SELECT SUM([Price]) FROM [{year}-{month}]";
+                command.ExecuteNonQuery();
+                gotBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
+            });
+
+            return gotBalance;
+        }
         #region IDisposable Support
         private bool disposedValue = false; // 重複する呼び出しを検出するには
 

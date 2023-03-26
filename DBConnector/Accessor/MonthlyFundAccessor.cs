@@ -41,14 +41,14 @@ namespace DBConnector.Accessor
 
             //まずは指定した年月の月初残高の存在有無を確認する
             SQLiteCommand command = new SQLiteCommand(Connection);
-            command.CommandText = BuildPickUpMonthlyFundQuery(year,month,false);
+            command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
             if (Convert.ToInt32(command.ExecuteScalar()) == 0)
             {
                 InsertFromPreviousMonth(new DateTime(year, month,1),Connection);//初日を想定しているので日付には1日を入れている
             }
             
             //月初日の残額を取得する
-            command.CommandText = BuildPickUpMonthlyFundQuery(year, month,true);
+            command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
             gotBalance = Convert.ToDecimal(command.ExecuteScalar());
             
             Connection.Close();
@@ -62,10 +62,14 @@ namespace DBConnector.Accessor
         /// <param name="connection">接続に利用しているconnectionオブジェクト</param>
         private void InsertFromPreviousMonth(DateTime pickedDate,SQLiteConnection connection) {
             SQLiteCommand command = new SQLiteCommand(connection);
-            command.CommandText = BuildPickUpMonthlyFundQuery(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month, true);
+            //ここ変更
+            command.CommandText = $" SELECT [Price] FROM[{TableName}] ORDER BY[{TableName}].ID DESC LIMIT 1";
             //前月の月初めの金額情報
             decimal prevBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
-            decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month);
+            //前月の集計
+            var lastSumGetter = new Controller.MoneyUsedDataTableManager();
+            decimal newBalance = prevBalance - lastSumGetter.LastMonthlySumPrice();
+            //decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month);
             this.InsertMonthlyFundRecord(pickedDate.Year,pickedDate.Month,newBalance,connection);
         }
 
@@ -75,15 +79,14 @@ namespace DBConnector.Accessor
         /// <param name="year">引き出したい年（西暦）</param>
         /// <param name="month">引き出したい月</param>
         /// <param name="isSingle">引き出したいレコードは単一の場合はtrue,それ以外はfalse</param>
-        private string BuildPickUpMonthlyFundQuery(int year, int month, bool isSingle)
+        private string BuildPickUpMonthlyFundQuery(string year, string month)
         {
             string returnQuery = "SELECT [Price] " +
-                                 "FROM [MonthlyFund] " +
+                                 $"FROM [{TableName}] " +
                                  $"WHERE [Year] = {year} " +
                                  $"AND[Month] = {month} " +
-                                 $"ORDER BY [{TableName}].ID DESC";
-            if (isSingle) { return returnQuery + " LIMIT 1"; }
-            else { return returnQuery; }
+                                 $"ORDER BY [{TableName}].ID DESC LIMIT 1";
+            return returnQuery; 
         }
 
         /// <summary>

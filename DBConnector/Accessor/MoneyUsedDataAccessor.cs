@@ -96,34 +96,34 @@ namespace DBConnector.Accessor
             return query.TrimEnd(',');//最後の余分なカンマは消して返す。
         }
 
-        /// <summary>
-        /// 月単位の合計利用金額を取得する。
-        /// ※引数で指定した年月の月別テーブルが無い場合は引数で指定した年月分の空のテーブルを作成してから月単位の合計金額を取得する。
-        /// </summary>
-        /// <param name="year">取得したい年</param>
-        /// <param name="month">取得したい月</param>
-        /// <returns></returns>
-        public static decimal GetMonthlyPrice(int year,int month)
-        {
-            using (var monthlyUsedManager = new MoneyUsedDataTableManager()) { 
-                //指定月の月別利用額テーブルが存在しない場合は作成する。
-                if (monthlyUsedManager.IsExistMonetaryTable($"{year}-{month.ToString("00")}") == false) { monthlyUsedManager.CreateTable($"{year}-{month.ToString("00")}"); }
-            }
-
-            decimal gotBalance;
-
-            using (var connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString })
-            {
-                connection.Open();
-                var command = new SQLiteCommand(connection);
-                command.CommandText = $"SELECT SUM([Price]) FROM [{year}-{month.ToString("00")}]";
-                command.ExecuteNonQuery();
-                gotBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
-                connection.Close();
-            }
-
-            return gotBalance;
-        }
+        ///// <summary>
+        ///// 月単位の合計利用金額を取得する。
+        ///// ※引数で指定した年月の月別テーブルが無い場合は引数で指定した年月分の空のテーブルを作成してから月単位の合計金額を取得する。
+        ///// </summary>
+        ///// <param name="year">取得したい年</param>
+        ///// <param name="month">取得したい月</param>
+        ///// <returns></returns>
+        //public static decimal GetMonthlyPrice(int year,int month)
+        //{
+        //    using (var monthlyUsedManager = new MoneyUsedDataTableManager()) { 
+        //        //指定月の月別利用額テーブルが存在しない場合は作成する。
+        //        if (monthlyUsedManager.IsExistMonetaryTable($"{year}-{month.ToString("00")}") == false) { monthlyUsedManager.CreateTable($"{year}-{month.ToString("00")}"); }
+        //    }
+        //
+        //    decimal gotBalance;
+        //
+        //    using (var connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString })
+        //    {
+        //        connection.Open();
+        //        var command = new SQLiteCommand(connection);
+        //        command.CommandText = $"SELECT SUM([Price]) FROM [{year}-{month.ToString("00")}]";
+        //        command.ExecuteNonQuery();
+        //        gotBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
+        //        connection.Close();
+        //    }
+        //
+        //    return gotBalance;
+        //}
 
     }
 
