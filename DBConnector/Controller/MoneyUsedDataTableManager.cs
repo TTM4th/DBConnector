@@ -117,7 +117,6 @@ namespace DBConnector.Controller
 
         /// <summary>
         /// 月単位の合計利用金額を取得する。
-        /// ※引数で指定した年月の月別テーブルが無い場合は引数で指定した年月分の空のテーブルを作成してから月単位の合計金額を取得する。
         /// </summary>
         /// <param name="year">取得したい年</param>
         /// <param name="month">取得したい月(2桁)</param>
