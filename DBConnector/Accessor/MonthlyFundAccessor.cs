@@ -41,11 +41,11 @@ namespace DBConnector.Accessor
 
             //まずは指定した年月の月初残高の存在有無を確認する
             SQLiteCommand command = new SQLiteCommand(Connection);
-            command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
-            if (Convert.ToInt32(command.ExecuteScalar()) == 0)
-            {
-                InsertFromPreviousMonth(new DateTime(year, month,1),Connection);//初日を想定しているので日付には1日を入れている
-            }
+            //command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
+            //if (Convert.ToInt32(command.ExecuteScalar()) == 0)
+            //{
+            //    InsertFromPreviousMonth(new DateTime(year, month,1),Connection);//初日を想定しているので日付には1日を入れている
+            //}
             
             //月初日の残額を取得する
             command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
@@ -55,22 +55,42 @@ namespace DBConnector.Accessor
             return gotBalance;
         }
 
+        public bool IsExistFirstBalance(int year, int month)
+        {
+            bool isexist = true;
+            using (var connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString }) {
+                connection.Open();
+                //まずは指定した年月の月初残高の存在有無を確認する
+                SQLiteCommand command = new SQLiteCommand(connection);
+                command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
+                if (Convert.ToInt32(command.ExecuteScalar()) == 0)
+                {
+                    isexist = false;
+                }
+                connection.Close();
+            }
+            return isexist;
+        }
         /// <summary>
-        /// 引数のDateTime構造体さかのぼって、前月の利用金額と前月の月初残額から引数の月初金額を計算して挿入する
+        /// 前月の利用金額と前月の月初残額から引数の月初金額を計算して挿入する
         /// </summary>
         /// <param name="pickedDate">挿入したい年月のDateTime構造体</param>
         /// <param name="connection">接続に利用しているconnectionオブジェクト</param>
-        private void InsertFromPreviousMonth(DateTime pickedDate,SQLiteConnection connection) {
-            SQLiteCommand command = new SQLiteCommand(connection);
-            //ここ変更
-            command.CommandText = $" SELECT [Price] FROM[{TableName}] ORDER BY[{TableName}].ID DESC LIMIT 1";
-            //前月の月初めの金額情報
-            decimal prevBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
-            //前月の集計
-            var lastSumGetter = new Controller.MoneyUsedDataTableManager();
-            decimal newBalance = prevBalance - lastSumGetter.LastMonthlySumPrice();
-            //decimal newBalance = prevBalance - MoneyUsedDataAccessor.GetMonthlyPrice(pickedDate.AddMonths(-1).Year, pickedDate.AddMonths(-1).Month);
-            this.InsertMonthlyFundRecord(pickedDate.Year,pickedDate.Month,newBalance,connection);
+        public void InsertFromPreviousMonth(int year, int month) {
+            using (var connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString })
+            {
+                connection.Open();
+                DateTime pickedDate = new DateTime(year, month, 1);
+                SQLiteCommand command = new SQLiteCommand(connection);
+                command.CommandText = $" SELECT [Price] FROM[{TableName}] ORDER BY[{TableName}].ID DESC LIMIT 1";
+                //前月の月初めの金額情報
+                decimal prevBalance = DBNull.Value.Equals(command.ExecuteScalar()) ? 0 : Convert.ToDecimal(command.ExecuteScalar());
+                //前月の集計
+                var lastSumGetter = new Controller.MoneyUsedDataTableManager();
+                decimal newBalance = prevBalance - lastSumGetter.LastMonthlySumPrice();
+                this.InsertMonthlyFundRecord(pickedDate.Year, pickedDate.Month, newBalance, connection);
+                connection.Close();
+            }
         }
 
         /// <summary>
