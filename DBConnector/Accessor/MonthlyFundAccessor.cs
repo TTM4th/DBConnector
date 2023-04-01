@@ -63,7 +63,7 @@ namespace DBConnector.Accessor
                 //まずは指定した年月の月初残高の存在有無を確認する
                 SQLiteCommand command = new SQLiteCommand(connection);
                 command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
-                if (DBNull.Value.Equals(command.ExecuteScalar()))
+                if (command.ExecuteScalar() is null)
                 {
                     isexist = false;
                 }
