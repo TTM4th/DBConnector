@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SQLite;
+using System.Text;
 
 namespace DBConnector.Accessor
 {
@@ -41,11 +42,6 @@ namespace DBConnector.Accessor
 
             //まずは指定した年月の月初残高の存在有無を確認する
             SQLiteCommand command = new SQLiteCommand(Connection);
-            //command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
-            //if (Convert.ToInt32(command.ExecuteScalar()) == 0)
-            //{
-            //    InsertFromPreviousMonth(new DateTime(year, month,1),Connection);//初日を想定しているので日付には1日を入れている
-            //}
             
             //月初日の残額を取得する
             command.CommandText = BuildPickUpMonthlyFundQuery(Convert.ToString(year), Convert.ToString(month));
@@ -98,15 +94,21 @@ namespace DBConnector.Accessor
         /// </summary>
         /// <param name="year">引き出したい年（西暦）</param>
         /// <param name="month">引き出したい月</param>
-        /// <param name="isSingle">引き出したいレコードは単一の場合はtrue,それ以外はfalse</param>
         private string BuildPickUpMonthlyFundQuery(string year, string month)
         {
-            string returnQuery = "SELECT [Price] " +
-                                 $"FROM [{TableName}] " +
-                                 $"WHERE [Year] = {year} " +
-                                 $"AND[Month] = {month} " +
-                                 $"ORDER BY [{TableName}].ID DESC LIMIT 1";
-            return returnQuery; 
+            var query = new StringBuilder();
+            query.AppendLine("SELECT [Price] ");
+            query.AppendLine($"FROM [{TableName}] ");
+            query.AppendLine($"WHERE [Year] = {year} ");
+            query.AppendLine($"AND[Month] = {month} ");
+            query.AppendLine($"ORDER BY [{TableName}].ID DESC LIMIT 1");
+            return query.ToString();
+            //string returnQuery = "SELECT [Price] " +
+            //                     $"FROM [{TableName}] " +
+            //                     $"WHERE [Year] = {year} " +
+            //                     $"AND[Month] = {month} " +
+            //                     $"ORDER BY [{TableName}].ID DESC LIMIT 1";
+            //return returnQuery; 
         }
 
         /// <summary>
@@ -125,38 +127,6 @@ namespace DBConnector.Accessor
             command.ExecuteNonQuery();
         }
 
-
-
-        ///// <summary>
-        ///// MonthlyFundに入っているレコードから一番最新の年と月を取得する
-        ///// </summary>
-        ///// <param name="connection">接続に利用しているconnectionオブジェクト</param>
-        ///// <returns>整数型の西暦四ケタ,月を取得する。初期状態の場合は両方とも０を返す</returns>
-        //private (int year,int month) PickUpMostRecentYearAndMonth(SQLiteConnection connection)
-        //{
-        //    SQLiteCommand command = new SQLiteCommand(connection)
-        //    {
-        //        CommandText = "SELECT MonthlyFund.Year,MonthlyFund.Month " +
-        //        "FROM MonthlyFund ORDER BY MonthlyFund.Year DESC,MonthlyFund.Month DESC LIMIT 1"
-        //    };
-
-        //    (int year, int month) returnTuple; 
-
-        //    SQLiteDataReader sdr = command.ExecuteReader();
-
-        //    if (sdr.HasRows) {
-        //        sdr.Read();
-        //        returnTuple = ((int)sdr["Year"], (int)sdr["Month"]);
-        //    }
-        //    else {
-        //        //初期状態で1行も存在していない場合
-        //        returnTuple=(0, 0);
-        //    }
-
-        //    sdr.Close();
-
-        //    return returnTuple;
-        //}
 
 
     }
