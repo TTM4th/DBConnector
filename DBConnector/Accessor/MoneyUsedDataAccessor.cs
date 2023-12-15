@@ -4,7 +4,6 @@ using System.Linq;
 using System.Data;
 using DBConnector.Entity;
 using System.Data.SQLite;
-using DBConnector.Controller;
 
 namespace DBConnector.Accessor
 {
