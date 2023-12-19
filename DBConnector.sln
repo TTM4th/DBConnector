@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.902
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBConnector", "DBConnector\DBConnector.csproj", "{F44458CF-E042-4AE2-BD1B-D915E1D7EB71}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.csproj", "{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +21,6 @@ Global
 		{F44458CF-E042-4AE2-BD1B-D915E1D7EB71}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F44458CF-E042-4AE2-BD1B-D915E1D7EB71}.Release|x64.ActiveCfg = Release|x64
 		{F44458CF-E042-4AE2-BD1B-D915E1D7EB71}.Release|x64.Build.0 = Release|x64
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Debug|x64.ActiveCfg = Debug|x64
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Debug|x64.Build.0 = Debug|x64
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Release|x64.ActiveCfg = Release|x64
-		{BD5B4CD9-5EDE-4994-AFB3-5F48A886A6E4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

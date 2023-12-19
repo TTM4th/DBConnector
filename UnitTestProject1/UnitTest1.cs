@@ -62,8 +62,8 @@ namespace UnitTestProject1
             if (testManger.IsExistMonetaryTable(tableName)) { testManger.InitializeTable(tableName); }
             else { testManger.CreateTable(tableName); }
 
-            var uploadObj = new List<DBConnector.Entity.MoneyUsedData>() {};
-            uploadObj.Add(new DBConnector.Entity.MoneyUsedData { ID = 1,Date="1999/01/02",Price=-15000,Classification="?" });
+            var uploadObj = new List<DBConnector.Entity.MoneyUsedData>() { };
+            uploadObj.Add(new DBConnector.Entity.MoneyUsedData { ID = 1, Date = "1999/01/02", Price = -15000, Classification = "?" });
             uploadObj.Add(new DBConnector.Entity.MoneyUsedData { ID = 2, Date = "1999/01/02", Price = 108, Classification = "2" });
 
             testObj.UploadMonetaryData(uploadObj);

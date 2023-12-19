@@ -58,9 +58,15 @@ namespace DBConnector.Controller
         {
             ConnectionClosure(() =>
                 {
-                    SQLiteCommand command = new SQLiteCommand(Connection);
-                    command.CommandText = $"CREATE TABLE [{tableName}] (ID int IDENTITY(1,1) NOT NULL," +
-                                         "[Date] date,Price decimal(28, 0),Classification char(1))";
+                    SQLiteCommand command = new SQLiteCommand(Connection)
+                    {
+                        CommandText = $"CREATE TABLE [{tableName}] ("+
+                                     "ID integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE," +
+                                     "[Date] date,"+
+                                     "Price decimal(28, 0),"+
+                                     "Classification char(1)"+
+                                     ")"
+                    };
                     command.ExecuteNonQuery();
                 }
             );
@@ -135,20 +141,6 @@ namespace DBConnector.Controller
             return gotBalance;
         }
 
-        //[2023-03-26]用意したけど必要なくなったのでコメントアウト
-        //public bool IsInitialTable(string year, string month)
-        //{
-        //    string name = $"{year}-{month}";
-        //    int resultcount = 0;
-        //    if (!this.IsExistMonetaryTable(name)){ return true; }
-        //    ConnectionClosure(() =>
-        //    {
-        //        SQLiteCommand command = new SQLiteCommand(Connection);
-        //        command.CommandText = $"SELECT COUNT(*) FROM [{name}]";
-        //        resultcount = Convert.ToInt32(command.ExecuteScalar());
-        //    });
-        //    return resultcount == 0;
-        //}
 
         #region IDisposable Support
         private bool disposedValue = false; // 重複する呼び出しを検出するには
