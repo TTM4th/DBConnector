@@ -103,12 +103,6 @@ namespace DBConnector.Accessor
             query.AppendLine($"AND[Month] = {month} ");
             query.AppendLine($"ORDER BY [{TableName}].ID DESC LIMIT 1");
             return query.ToString();
-            //string returnQuery = "SELECT [Price] " +
-            //                     $"FROM [{TableName}] " +
-            //                     $"WHERE [Year] = {year} " +
-            //                     $"AND[Month] = {month} " +
-            //                     $"ORDER BY [{TableName}].ID DESC LIMIT 1";
-            //return returnQuery; 
         }
 
         /// <summary>
