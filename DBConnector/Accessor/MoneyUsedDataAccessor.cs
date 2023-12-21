@@ -60,6 +60,10 @@ namespace DBConnector.Accessor
             this.UpdateDataTable(query);
         }
 
+        /// <summary>
+        /// データテーブルの更新ロジック
+        /// </summary>
+        /// <param name="commandText">更新内容クエリ</param>
         private void UpdateDataTable(string commandText)
         {
             var connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
@@ -91,17 +95,17 @@ namespace DBConnector.Accessor
         /// </summary>
         /// <param name="data">変換したい金銭管理データ</param>
         /// <returns></returns>
-        internal string BuildReplaceQuery(IEnumerable<MoneyUsedData> data)
+        private string BuildReplaceQuery(IEnumerable<MoneyUsedData> data)
         {
             var query = new StringBuilder($"INSERT INTO [{TableName}] VALUES ");
             var values = data.Select(item => $"({item.ID},'{item.Date.Replace('/', '-')}',{item.Price},'{item.Classification}')").ToList();
-            query.Append(string.Join(",", values));
-            query.Append("ON CONFLICT(ID) ");
-            query.Append("DO UPDATE ");
-            query.Append("SET [Date] = excluded.Date, [Price] = excluded.Price, [Classification] = excluded.Classification; ");
-            query.Append($"DELETE FROM [{TableName}] ");
             var ids = string.Join(",", data.Select(x => x.ID).ToList());
-            query.Append($"WHERE ID NOT IN ({ids})");
+            query.AppendLine(string.Join(",", values));
+            query.AppendLine("ON CONFLICT(ID) ");
+            query.AppendLine("DO UPDATE ");
+            query.AppendLine("SET [Date] = excluded.Date, [Price] = excluded.Price, [Classification] = excluded.Classification; ");
+            query.AppendLine($"DELETE FROM [{TableName}] ");
+            query.AppendLine($"WHERE ID NOT IN ({ids})");
             return query.ToString();
         }
 
