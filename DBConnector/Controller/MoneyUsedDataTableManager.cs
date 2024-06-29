@@ -94,7 +94,7 @@ namespace DBConnector.Controller
         /// 月別利用額テーブル名を降順で一括取得する
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyList<string> MonthlyTableNames()
+        public IEnumerable<string> MonthlyTableNames()
         {
             DataTable dataTable = new DataTable();
             const int firstColumnIndex = 0;

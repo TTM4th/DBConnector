@@ -2,18 +2,18 @@
 
 namespace DBConnector.Entity
 {
-    public class MoneyUsedData
+    public class MoneyUsedDataEntity
     {
         /// <summary>
         /// 空のデータを作成する際のコンストラクタ
         /// </summary>
-        public MoneyUsedData() { }
+        public MoneyUsedDataEntity() { }
 
         /// <summary>
         /// DataRowから作成する際のコンストラクタ
         /// </summary>
         /// <param name="row"></param>
-        public MoneyUsedData(System.Data.DataRow row)
+        public MoneyUsedDataEntity(System.Data.DataRow row)
         {
             ID = Convert.ToInt32(row[nameof(ID)]);
             var rawdate = (DateTime)row[nameof(Date)];

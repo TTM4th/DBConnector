@@ -24,7 +24,7 @@ namespace DBConnector.Accessor
         /// <summary>
         /// DataTableから取得した金銭管理データリスト
         /// </summary>
-        public IReadOnlyList<MoneyUsedData> MoneyUsedDataEntitiesFromTable { get; private set; }
+        public IEnumerable<MoneyUsedDataEntity> MoneyUsedDataEntitiesFromTable { get; private set; }
 
         /// <summary>
         /// テーブルから金銭管理データを取得する。
@@ -37,7 +37,7 @@ namespace DBConnector.Accessor
             var dataSet=new DataSet();
             adapter.Fill(dataSet);
             MoneyUsedDataEntitiesFromTable = dataSet.Tables.OfType<DataTable>().Single()
-                                        .Rows.OfType<DataRow>().Select(row => new MoneyUsedData(row)).ToList();
+                                        .Rows.OfType<DataRow>().Select(row => new MoneyUsedDataEntity(row)).ToList();
             connection.Close();
         }
 
@@ -46,7 +46,7 @@ namespace DBConnector.Accessor
         /// 引数で受け取った金銭管理データをデータベースにアップロードする
         /// </summary>
         /// <param name="moneyUsedData">アップロードしたい金銭管理データ</param>
-        public void UploadMonetaryData(IEnumerable<MoneyUsedData> moneyUsedData)
+        public void UploadMonetaryData(IEnumerable<MoneyUsedDataEntity> moneyUsedData)
         {
             this.UpdateDataTable(BuildReplaceQuery(moneyUsedData));
         }
@@ -64,7 +64,7 @@ namespace DBConnector.Accessor
         /// データテーブルの更新ロジック
         /// </summary>
         /// <param name="commandText">更新内容クエリ</param>
-        private void UpdateDataTable(string commandText)
+        public void UpdateDataTable(string commandText)
         {
             var connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };
             using (SQLiteCommand command = connection.CreateCommand())
@@ -95,7 +95,7 @@ namespace DBConnector.Accessor
         /// </summary>
         /// <param name="data">変換したい金銭管理データ</param>
         /// <returns></returns>
-        private string BuildReplaceQuery(IEnumerable<MoneyUsedData> data)
+        private string BuildReplaceQuery(IEnumerable<MoneyUsedDataEntity> data)
         {
             var query = new StringBuilder($"INSERT INTO [{TableName}] VALUES ");
             var values = data.Select(item => $"({item.ID},'{item.Date.Replace('/', '-')}',{item.Price},'{item.Classification}')").ToList();
