@@ -128,8 +128,7 @@ namespace DBConnector.Extention
             var outObj = (outType)Activator.CreateInstance(outObjType);
             foreach (var fieldName in outObjType.GetFields().Select(x => x.Name))
             {
-                var fieldinfo = outObjType.GetField(fieldName, BindingFlags.Public);
-                fieldinfo.SetValue(outObj, row[fieldName]);
+                outObjType.GetField(fieldName, BindingFlags.Public).SetValue(outObj, row[fieldName]);
             }
             return outObj;
         }

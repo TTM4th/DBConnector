@@ -8,6 +8,9 @@ using System.Text;
 
 namespace DBConnector.Data
 {
+    /// <summary>
+    /// 月別利用金額テーブル【テーブル名：yyyy(年４桁)-mm（月２桁）】 回り データ操作 インターフェース
+    /// </summary>
     public interface IMoneyUsedData
     {
         /// <summary>
@@ -54,6 +57,9 @@ namespace DBConnector.Data
         public IEnumerable<string> MonthlyTableNames();
     }
 
+    /// <summary>
+    /// 月別利用金額テーブル【テーブル名：yyyy(年４桁)-mm（月２桁）】 回り データ操作 クラス
+    /// </summary>
     public class MoneyUsedData : IMoneyUsedData
     {
         /// <summary>

@@ -3,6 +3,9 @@ using System.Data;
 
 namespace DBConnector.Extention
 {
+    /// <summary>
+    /// IDbCommandの拡張メソッド
+    /// </summary>
     public static class IDBCommandExtentions
     {
         /// <summary>
