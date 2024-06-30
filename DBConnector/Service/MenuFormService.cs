@@ -19,15 +19,21 @@ namespace DBConnector.Service
         /// </summary>
         private readonly IMoneyUsedData _moneyUsed;
 
+        /// <summary>
+        /// 今月の西暦年（４桁）
+        /// </summary>
         private int NowYear => DateTime.Now.Year;
 
+        /// <summary>
+        /// 今月
+        /// </summary>
         private int NowMonth => DateTime.Now.Month;
 
         /// <summary>
-        /// 
+        /// コンストラクタ
         /// </summary>
-        /// <param name="monthlyFund"></param>
-        /// <param name="moneyUsed"></param>
+        /// <param name="monthlyFund">MonthlyFundテーブルの操作クラス</param>
+        /// <param name="moneyUsed">月別利用金額テーブル【テーブル名：yyyy(年４桁)-mm（月２桁）】の操作クラス</param>
         public MenuFormService(IMonthlyFundData monthlyFund, IMoneyUsedData moneyUsed)
         {
             _monthlyFund = monthlyFund;
@@ -99,6 +105,10 @@ namespace DBConnector.Service
             return _moneyUsed.LoadMoneyUsedData(year, month).GroupBy(x => x.Classification).ToDictionary(x => x.Key, x => x.Select(x => x.Price).Sum());
         }
 
+        /// <summary>
+        /// 現在月の手持金額を取得する
+        /// </summary>
+        /// <returns></returns>
         public decimal GetCurrentBalance()
         {
             return _monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00"));

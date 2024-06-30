@@ -12,6 +12,11 @@
     <OutputPath>bin\x64\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Controller\**" />
+    <EmbeddedResource Remove="Controller\**" />
+    <None Remove="Controller\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="MonetaryManagement.db" />
   </ItemGroup>
   <ItemGroup>
@@ -37,8 +42,5 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controller\" />
   </ItemGroup>
 </Project>

@@ -2,6 +2,9 @@
 
 namespace DBConnector.Model
 {
+    /// <summary>
+    /// MenuForm用ViewModel
+    /// </summary>
     public class MenuFormModel
     {
         /// <summary>
