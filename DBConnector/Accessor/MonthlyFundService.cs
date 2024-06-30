@@ -7,7 +7,7 @@ namespace DBConnector.Accessor
     /// <summary>
     /// 月別月初残高テーブルのAcceserクラス
     /// </summary>
-    public class MonthlyFundAccessor
+    public class MonthlyFundService
     {
 
         #region 各種変数・プロパティ
@@ -26,7 +26,7 @@ namespace DBConnector.Accessor
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public MonthlyFundAccessor() { }
+        public MonthlyFundService() { }
 
         /// <summary>
         /// 指定した年月の最新残高を取得する
@@ -34,7 +34,7 @@ namespace DBConnector.Accessor
         /// <param name="year">取得したい年</param>
         /// <param name="month">取得したい月</param>
         /// <returns></returns>
-        public decimal GetMonthFirstBalance(int year,int month)
+        public decimal LoadMonthFirstBalance(int year,int month)
         {
             decimal gotBalance;
             Connection = new SQLiteConnection { ConnectionString = Properties.Settings.Default.ConnectionString };

@@ -32,8 +32,9 @@ namespace DBConnector.Data
         /// <summary>
         /// 金銭管理テーブル新規作成
         /// </summary>
-        /// <param name="tableName"></param>
-        public void CreateTable(string tableName);
+        /// <param name="year">存在確認をしたい年</param>
+        /// <param name="month">存在確認をしたい月</param>
+        public void CreateTable(string year, string month);
 
         /// <summary>
         /// 月単位の合計利用金額を取得する。
@@ -41,14 +42,15 @@ namespace DBConnector.Data
         /// <param name="year">取得したい年</param>
         /// <param name="month">取得したい月(2桁)</param>
         /// <returns></returns>
-        public decimal GetMonthlySumPrice(string year, string month);
+        public decimal LoadMonthlySumPrice(string year, string month);
 
         /// <summary>
         /// テーブルが存在するか確認する
         /// </summary>
-        /// <param name="tableName">存在確認をしたいテーブル名</param>
+        /// <param name="year">存在確認をしたい年</param>
+        /// <param name="month">存在確認をしたい月</param>
         /// <returns></returns>
-        public bool IsExistMonetaryTable(string tableName);
+        public bool IsExistMonetaryTable(string year, string month);
 
         /// <summary>
         /// 月別利用額テーブル名を降順で一括取得する
@@ -77,9 +79,9 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public void CreateTable(string tableName)
+        public void CreateTable(string year, string month)
         {
-            var query = $"CREATE TABLE [{tableName}] (" +
+            var query = $"CREATE TABLE [{year}-{month}] (" +
                                      "ID integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE," +
                                      "[Date] date," +
                                      "Price decimal(28, 0)," +
@@ -96,16 +98,16 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public decimal GetMonthlySumPrice(string year, string month)
+        public decimal LoadMonthlySumPrice(string year, string month)
         {
             var query = $"SELECT SUM([Price]) As SumPrice FROM [{year}-{month}]";
             return _db.Connection.GetFirstOrDefaultData<decimal>(query);
         }
 
         /// <inheritdoc />
-        public bool IsExistMonetaryTable(string tableName)
+        public bool IsExistMonetaryTable(string year, string month)
         {
-            var query = $"SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND name='{tableName}'";
+            var query = $"SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND name='{year}-{month}'";
             uint resultNum = _db.Connection.ExecuteQueryWithValue<uint>(query);
             return resultNum > 0;
         }
