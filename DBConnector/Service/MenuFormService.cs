@@ -1,14 +1,20 @@
 ﻿using DBConnector.Data;
+using DBConnector.Model;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace DBConnector.Service
 {
     public class MenuFormService
     {
+        /// <summary>
+        /// 月初総額情報テーブル【テーブル名：MonthlFund】回り データ操作
+        /// </summary>
         private readonly IMonthlyFundData _monthlyFund;
 
+        /// <summary>
+        /// 月別利用金額テーブル【テーブル名：yyyy(年４桁)-mm（月２桁）】 回り データ操作
+        /// </summary>
         private readonly IMoneyUsedData _moneyUsed;
 
         private int NowYear => DateTime.Now.Year;
@@ -43,7 +49,7 @@ namespace DBConnector.Service
             var recentInitialbalance = _monthlyFund.LoadRecentMonthFirstPrice();
             var yeardate = _moneyUsed.MonthlyTableNames().First().Split('-');
             var recentMonthSumBalance = _moneyUsed.LoadMonthlySumPrice(yeardate[0], yeardate[1]);
-            _monthlyFund.InsertMonthlyFundRecord(NowYear, NowMonth, (decimal)recentInitialbalance - recentMonthSumBalance);
+            _monthlyFund.InsertMonthlyFundRecord(NowYear, NowMonth, (decimal)(recentInitialbalance - recentMonthSumBalance));
         }
 
         /// <summary>
@@ -73,17 +79,10 @@ namespace DBConnector.Service
             return new MenuFormModel
             {
                 MonthlyTableNames = _moneyUsed.MonthlyTableNames().Take(6).ToArray(),
-                CurrentBalance = (decimal)_monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00")),
+                CurrentBalance = (decimal)(_monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00"))),
                 MoneyUsedData = _moneyUsed.LoadMoneyUsedData(NowYear.ToString(), NowMonth.ToString("00")).GroupBy(x => x.Classification).ToDictionary(x => x.Key, x => x.Select(x => x.Price).Sum())
             };
         }
 
-    }
-
-    public class MenuFormModel
-    {
-        public IEnumerable<string> MonthlyTableNames { get; set; }
-        public decimal CurrentBalance { get; set;}
-        public IDictionary<string, decimal> MoneyUsedData { get; set; }
     }
 }

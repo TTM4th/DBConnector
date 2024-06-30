@@ -66,7 +66,7 @@ namespace DBConnector.Extention
         /// <returns></returns>
         public static IEnumerable<outType> GetData<outType>(this SQLiteConnection connection, string query)
         {
-            return connection.GetResult(query, MapFactory<outType>()).ToArray();
+            return GetResult(connection, query, MapFactory<outType>()).ToArray();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace DBConnector.Extention
         /// <returns></returns>
         public static outType GetFirstOrDefaultData<outType>(this SQLiteConnection connection, string query)
         {
-            return connection.GetResult(query, MapFactory<outType>()).FirstOrDefault();
+            return GetResult(connection, query, MapFactory<outType>()).FirstOrDefault();
         }
 
         /// <summary>
@@ -88,16 +88,16 @@ namespace DBConnector.Extention
         /// <param name="query">クエリ</param>
         /// <param name="predMap">マップしてほしい型にマップする匿名関数</param>
         /// <returns></returns>
-        public static IEnumerable<outType> GetResult<outType>(this SQLiteConnection connection, 
+        public static IEnumerable<outType> GetResult<outType>(SQLiteConnection connection, 
                                                             string query, 
                                                             Func<IDataRecord, outType> predMap)
         {
             IEnumerable<outType> result = Enumerable.Empty<outType>();
             using (connection)
             {
-                var selectCommand = new SQLiteCommand(query, connection);
                 connection.Open();
-                result = selectCommand.EnumerateAll().Select(row => predMap(row));
+                var selectCommand = new SQLiteCommand(query, connection);
+                result = selectCommand.EnumerateAll().Select(row => predMap(row)).ToArray();
             }
             return result;
         }
@@ -126,9 +126,10 @@ namespace DBConnector.Extention
         {
             var outObjType = typeof(outType);
             var outObj = (outType)Activator.CreateInstance(outObjType);
-            foreach (var fieldName in outObjType.GetFields().Select(x => x.Name))
+            foreach (var property in outObjType.GetProperties())
             {
-                outObjType.GetField(fieldName, BindingFlags.Public).SetValue(outObj, row[fieldName]);
+                
+                property.SetValue(outObj, Convert.ChangeType(row[property.Name], property.PropertyType));
             }
             return outObj;
         }

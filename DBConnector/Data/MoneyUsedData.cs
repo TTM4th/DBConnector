@@ -1,9 +1,11 @@
 ﻿using DBConnector.Accessor;
 using DBConnector.Entity;
 using DBConnector.Extention;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DBConnector.Data
@@ -42,7 +44,7 @@ namespace DBConnector.Data
         /// <param name="year">取得したい年</param>
         /// <param name="month">取得したい月(2桁)</param>
         /// <returns></returns>
-        public decimal LoadMonthlySumPrice(string year, string month);
+        public decimal? LoadMonthlySumPrice(string year, string month);
 
         /// <summary>
         /// テーブルが存在するか確認する
@@ -98,17 +100,18 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public decimal LoadMonthlySumPrice(string year, string month)
+        public decimal? LoadMonthlySumPrice(string year, string month)
         {
-            var query = $"SELECT SUM([Price]) As SumPrice FROM [{year}-{month}]";
-            return _db.Connection.GetFirstOrDefaultData<decimal>(query);
+            var query = $"SELECT CAST(SUM([Price]) AS decimal(28, 0)) FROM [{year}-{month}]";
+            var result = _db.Connection.ExecuteQueryWithValue<object>(query);
+            return Convert.ToDecimal(result);
         }
 
         /// <inheritdoc />
         public bool IsExistMonetaryTable(string year, string month)
         {
             var query = $"SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND name='{year}-{month}'";
-            uint resultNum = _db.Connection.ExecuteQueryWithValue<uint>(query);
+            int resultNum = (int)_db.Connection.ExecuteQueryWithValue<long>(query);
             return resultNum > 0;
         }
 
