@@ -85,7 +85,7 @@ namespace DBConnector.Data
             query.AppendLine("\t\"Price\"\tdecimal(28, 0),");
             query.AppendLine("\tPRIMARY KEY(\"ID\" AUTOINCREMENT)");
             query.AppendLine(")");
-            throw new System.NotImplementedException();
+            _db.Connection.ApplyChangeDataTable(query.ToString());
         }
 
         /// <inheritdoc />

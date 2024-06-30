@@ -100,7 +100,7 @@ namespace DBConnector.Data
         /// <inheritdoc />
         public decimal LoadMonthlySumPrice(string year, string month)
         {
-            var query = $"SELECT CAST(SUM([Price]) AS decimal(28, 0)) FROM [{year}-{month}]";
+            var query = $"SELECT CAST(COALESCE(SUM([Price]),0) AS decimal(28, 0)) FROM [{year}-{month}]";
             return _db.Connection.ExecuteQueryWithValue<decimal>(query);
         }
 

@@ -1,7 +1,9 @@
 ﻿using DBConnector.Data;
 using DBConnector.Model;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Windows.ApplicationModel.Appointments;
 
 namespace DBConnector.Service
 {
@@ -66,7 +68,7 @@ namespace DBConnector.Service
             var recentInitialbalance = _monthlyFund.LoadRecentMonthFirstPrice();
             var yeardate = _moneyUsed.MonthlyTableNames().First().Split('-');
             var recentMonthSumBalance = _moneyUsed.LoadMonthlySumPrice(yeardate[0], yeardate[1]);
-            _monthlyFund.InsertMonthlyFundRecord(NowYear, NowMonth, (decimal)(recentInitialbalance - recentMonthSumBalance));
+            _monthlyFund.InsertMonthlyFundRecord(NowYear, NowMonth, (recentInitialbalance - recentMonthSumBalance));
         }
 
         /// <summary>
@@ -88,6 +90,21 @@ namespace DBConnector.Service
         }
 
         /// <summary>
+        /// 引数で指定した年月の区分別集計データを取得する
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        public IDictionary<string, decimal> LoadSumPricesByClassification(string year, string month)
+        {
+            return _moneyUsed.LoadMoneyUsedData(year, month).GroupBy(x => x.Classification).ToDictionary(x => x.Key, x => x.Select(x => x.Price).Sum());
+        }
+
+        public decimal GetCurrentBalance()
+        {
+            return _monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00"));
+        }
+
+        /// <summary>
         /// ビュー用モデルを取得する
         /// </summary>
         /// <returns></returns>
@@ -96,7 +113,7 @@ namespace DBConnector.Service
             return new MenuFormModel
             {
                 MonthlyTableNames = _moneyUsed.MonthlyTableNames().Take(6).ToArray(),
-                CurrentBalance = (_monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00"))),
+                CurrentBalance = GetCurrentBalance(),
                 MoneyUsedData = _moneyUsed.LoadMoneyUsedData(NowYear.ToString(), NowMonth.ToString("00")).GroupBy(x => x.Classification).ToDictionary(x => x.Key, x => x.Select(x => x.Price).Sum())
             };
         }

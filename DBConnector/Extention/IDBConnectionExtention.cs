@@ -127,7 +127,17 @@ namespace DBConnector.Extention
             var outObj = (outType)Activator.CreateInstance(outObjType);
             foreach (var property in outObjType.GetProperties())
             {
-                property.SetValue(outObj, Convert.ChangeType(row[property.Name], property.PropertyType));
+                object rowObj;
+                if (row[property.Name].GetType() == typeof(DateTime))
+                {
+                    DateTime _ = (DateTime)row[property.Name];
+                    rowObj  = _.ToShortDateString();
+                }
+                else
+                {
+                    rowObj = row[property.Name];
+                }
+                property.SetValue(outObj, Convert.ChangeType(rowObj, property.PropertyType));
             }
             return outObj;
         }
