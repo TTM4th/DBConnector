@@ -64,12 +64,17 @@ namespace DBConnector.Service
             _moneyUsed.CreateTable(NowYear.ToString(), NowMonth.ToString("00"));
         }
 
+        /// <summary>
+        /// ビュー用モデルを取得する
+        /// </summary>
+        /// <returns></returns>
         public MenuFormModel CreateViewModel()
         {
             return new MenuFormModel
             {
                 MonthlyTableNames = _moneyUsed.MonthlyTableNames().Take(6).ToArray(),
-                CurrentBalance = (decimal)_monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00"))
+                CurrentBalance = (decimal)_monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00")),
+                MoneyUsedData = _moneyUsed.LoadMoneyUsedData(NowYear.ToString(), NowMonth.ToString("00")).GroupBy(x => x.Classification).ToDictionary(x => x.Key, x => x.Select(x => x.Price).Sum())
             };
         }
 
@@ -79,5 +84,6 @@ namespace DBConnector.Service
     {
         public IEnumerable<string> MonthlyTableNames { get; set; }
         public decimal CurrentBalance { get; set;}
+        public IDictionary<string, decimal> MoneyUsedData { get; set; }
     }
 }

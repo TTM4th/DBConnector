@@ -16,7 +16,7 @@ namespace DBConnector.Data
         /// <summary>
         /// DataTableから取得した金銭管理データリスト
         /// </summary>
-        public IEnumerable<MoneyUsedDataEntity> LoadMoneyUsedData(string tableName);
+        public IEnumerable<MoneyUsedDataEntity> LoadMoneyUsedData(string year, string month);
 
         /// <summary>
         /// 引数で受け取った金銭管理データをデータベースにアップロードする
@@ -113,9 +113,9 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public IEnumerable<MoneyUsedDataEntity> LoadMoneyUsedData(string tableName)
+        public IEnumerable<MoneyUsedDataEntity> LoadMoneyUsedData(string year, string month)
         {
-            var query = $"SELECT * FROM [{tableName}]";
+            var query = $"SELECT * FROM [{year}-{month}]";
             return _db.Connection.GetData<MoneyUsedDataEntity>(query);
         }
 
