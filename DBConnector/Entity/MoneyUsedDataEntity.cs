@@ -10,19 +10,6 @@ namespace DBConnector.Entity
         public MoneyUsedDataEntity() { }
 
         /// <summary>
-        /// DataRowから作成する際のコンストラクタ
-        /// </summary>
-        /// <param name="row"></param>
-        public MoneyUsedDataEntity(System.Data.DataRow row)
-        {
-            ID = Convert.ToInt32(row[nameof(ID)]);
-            var rawdate = (DateTime)row[nameof(Date)];
-            Date = rawdate.ToShortDateString();
-            Price = (decimal)row[nameof(Price)];
-            Classification = (string)row[nameof(Classification)];
-        }
-
-        /// <summary>
         /// ID
         /// </summary>
         public int ID { get; set; }

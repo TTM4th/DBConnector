@@ -22,12 +22,12 @@ namespace DBConnector.Data
         /// 引数で受け取った金銭管理データをデータベースにアップロードする
         /// </summary>
         /// <param name="moneyUsedData">アップロードしたい金銭管理データ</param>
-        public void UploadMonetaryData(IEnumerable<MoneyUsedDataEntity> moneyUsedData, string tableName);
+        public void UploadMonetaryData(IEnumerable<MoneyUsedDataEntity> moneyUsedData, string year, string month);
 
         /// <summary>
         /// 金銭管理データの消去※
         /// </summary>
-        public void DeleteMonetaryData(string tableName);
+        public void DeleteMonetaryData(string year, string month);
 
         /// <summary>
         /// 金銭管理テーブル新規作成
@@ -91,9 +91,9 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public void DeleteMonetaryData(string tableName)
+        public void DeleteMonetaryData(string year, string month)
         {
-            var query = $"DELETE FROM [{tableName}]; DELETE FROM sqlite_sequence WHERE name = {tableName}";
+            var query = $"DELETE FROM [{year}-{month}]; DELETE FROM sqlite_sequence WHERE name = {year}-{month}";
             _db.Connection.ApplyChangeDataTable(query);
         }
 
@@ -127,14 +127,14 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public void UploadMonetaryData(IEnumerable<MoneyUsedDataEntity> moneyUsedData, string tableName)
+        public void UploadMonetaryData(IEnumerable<MoneyUsedDataEntity> moneyUsedData, string year, string month)
         {
-            var query = new StringBuilder($"INSERT INTO [{tableName}] VALUES ");
+            var query = new StringBuilder($"INSERT INTO [{year}-{month}] VALUES ");
             query.AppendLine(string.Join(",", moneyUsedData.Select(item => $"({item.ID},'{item.Date.Replace('/', '-')}',{item.Price},'{item.Classification}')").ToArray()));
             query.AppendLine("ON CONFLICT(ID) ");
             query.AppendLine("DO UPDATE ");
             query.AppendLine("SET [Date] = excluded.Date, [Price] = excluded.Price, [Classification] = excluded.Classification; ");
-            query.AppendLine($"DELETE FROM [{tableName}] ");
+            query.AppendLine($"DELETE FROM [{year}-{month}] ");
             query.AppendLine($"WHERE ID NOT IN ({string.Join(",", moneyUsedData.Select(x => x.ID).ToArray())})");
 
             _db.Connection.ApplyChangeDataTable(query.ToString());

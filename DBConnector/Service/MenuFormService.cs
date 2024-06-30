@@ -96,7 +96,7 @@ namespace DBConnector.Service
             return new MenuFormModel
             {
                 MonthlyTableNames = _moneyUsed.MonthlyTableNames().Take(6).ToArray(),
-                CurrentBalance = (decimal)(_monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00"))),
+                CurrentBalance = (_monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) - _moneyUsed.LoadMonthlySumPrice(NowYear.ToString(), NowMonth.ToString("00"))),
                 MoneyUsedData = _moneyUsed.LoadMoneyUsedData(NowYear.ToString(), NowMonth.ToString("00")).GroupBy(x => x.Classification).ToDictionary(x => x.Key, x => x.Select(x => x.Price).Sum())
             };
         }
