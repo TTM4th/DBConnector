@@ -18,7 +18,7 @@ namespace DBConnector.Accessor
     public class MonetaryManagementDataAdapter : IDbAccessor
     {
 
-        public MonetaryManagementDataAdapter() 
+        public MonetaryManagementDataAdapter()
         {
         }
 

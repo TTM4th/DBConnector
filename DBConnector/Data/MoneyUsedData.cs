@@ -1,11 +1,9 @@
 ﻿using DBConnector.Accessor;
 using DBConnector.Entity;
 using DBConnector.Extention;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DBConnector.Data
@@ -44,7 +42,7 @@ namespace DBConnector.Data
         /// <param name="year">取得したい年</param>
         /// <param name="month">取得したい月(2桁)</param>
         /// <returns></returns>
-        public decimal? LoadMonthlySumPrice(string year, string month);
+        public decimal LoadMonthlySumPrice(string year, string month);
 
         /// <summary>
         /// テーブルが存在するか確認する
@@ -100,11 +98,10 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public decimal? LoadMonthlySumPrice(string year, string month)
+        public decimal LoadMonthlySumPrice(string year, string month)
         {
             var query = $"SELECT CAST(SUM([Price]) AS decimal(28, 0)) FROM [{year}-{month}]";
-            var result = _db.Connection.ExecuteQueryWithValue<object>(query);
-            return Convert.ToDecimal(result);
+            return _db.Connection.ExecuteQueryWithValue<decimal>(query);
         }
 
         /// <inheritdoc />

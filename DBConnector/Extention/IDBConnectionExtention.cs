@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using System.Reflection;
 
 namespace DBConnector.Extention
 {
@@ -53,7 +52,7 @@ namespace DBConnector.Extention
             {
                 var selectCommand = new SQLiteCommand(query, connection);
                 connection.Open();
-                returnObj = (outType)selectCommand.ExecuteScalar();
+                returnObj = (outType)Convert.ChangeType(selectCommand.ExecuteScalar(), typeof(outType));
             }
             return returnObj;
         }
@@ -88,8 +87,8 @@ namespace DBConnector.Extention
         /// <param name="query">クエリ</param>
         /// <param name="predMap">マップしてほしい型にマップする匿名関数</param>
         /// <returns></returns>
-        public static IEnumerable<outType> GetResult<outType>(SQLiteConnection connection, 
-                                                            string query, 
+        public static IEnumerable<outType> GetResult<outType>(SQLiteConnection connection,
+                                                            string query,
                                                             Func<IDataRecord, outType> predMap)
         {
             IEnumerable<outType> result = Enumerable.Empty<outType>();
@@ -128,7 +127,6 @@ namespace DBConnector.Extention
             var outObj = (outType)Activator.CreateInstance(outObjType);
             foreach (var property in outObjType.GetProperties())
             {
-                
                 property.SetValue(outObj, Convert.ChangeType(row[property.Name], property.PropertyType));
             }
             return outObj;
@@ -142,8 +140,7 @@ namespace DBConnector.Extention
         /// <returns></returns>
         private static outType MappingValue<outType>(IDataRecord row)
         {
-            outType outObj = (outType)row[0];
-            return outObj;
+            return (outType)Convert.ChangeType(row[0], typeof(outType));
         }
     }
 

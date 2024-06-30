@@ -33,12 +33,29 @@ namespace DBConnector.Service
         }
 
         /// <summary>
+        /// 月別総額情報テーブルの存在有無をチェックする
+        /// </summary>
+        /// <returns></returns>
+        public bool IsExistMonthlyFundTable()
+        {
+            return _monthlyFund.IsExistMonthlyFundTable();
+        }
+
+        /// <summary>
+        /// 月別総額情報テーブルを生成する
+        /// </summary>
+        public void CreateMonthlyFundTable()
+        {
+            _monthlyFund.CreateTable();
+        }
+
+        /// <summary>
         /// 当月の月始残高の存在有無を確認する
         /// </summary>
         /// <returns></returns>
         public bool IsExistFirstBalance()
         {
-            return _monthlyFund.LoadMonthFirstBalance(NowYear, NowMonth) != null;
+            return _monthlyFund.IsExistMonthFirstBalance(NowYear, NowMonth);
         }
 
         /// <summary>

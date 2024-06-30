@@ -1,5 +1,4 @@
-﻿using DBConnector.Entity;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DBConnector.Model
 {
