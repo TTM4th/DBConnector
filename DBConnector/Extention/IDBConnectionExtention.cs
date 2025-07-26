@@ -44,7 +44,7 @@ namespace DBConnector.Extention
         /// </summary>
         /// <param name="connection">マップしたいクラス情報</param>
         /// <param name="query">クエリ</param>
-        /// <returns>実行結果がnullの場合はジェネリックのdefaultを返す</returns>
+        /// <returns>実行結果がnullの場合は型パラメータで渡された型のdefaultを返す</returns>
         public static outType ExecuteQueryWithValue<outType>(this SQLiteConnection connection, string query)
         {
             outType returnObj;
