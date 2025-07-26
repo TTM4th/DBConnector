@@ -3,7 +3,6 @@ using DBConnector.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.ApplicationModel.Appointments;
 
 namespace DBConnector.Service
 {
@@ -67,14 +66,33 @@ namespace DBConnector.Service
         }
 
         /// <summary>
-        /// 前月の利用金額総額と前月の月初金額から当月の月始金額を計算して月初金額テーブル(MonthlyFund)に挿入する
+        /// 当月の月始残高を取得する
         /// </summary>
-        public void InsertFromPreviousMonth()
+        public decimal? RecentInitialBalance => _monthlyFund.LoadRecentMonthFirstPrice();
+
+        /// <summary>
+        /// 月別利用金額テーブルの存在有無一覧
+        /// </summary>
+        public IEnumerable<string> MonthlyTableNames => _moneyUsed.MonthlyTableNames();
+
+        /// <summary>
+        /// 引数で指定した月別テーブル名の利用金額総額を取得する
+        /// </summary>
+        /// <param name="monthlyTableName">【テーブル名：yyyy(年４桁)-mm（月２桁）】で設定された月別テーブル名文字列</param>
+        /// <returns>引数で指定したテーブル内にある利用金額を集計した総額</returns>
+        public decimal GetMonthlySumPrice(string monthlyTableName)
         {
-            var recentInitialbalance = _monthlyFund.LoadRecentMonthFirstPrice();
-            var yeardate = _moneyUsed.MonthlyTableNames().First().Split('-');
-            var recentMonthSumBalance = _moneyUsed.LoadMonthlySumPrice(yeardate[0], yeardate[1]);
-            _monthlyFund.InsertMonthlyFundRecord(NowYear, NowMonth, (recentInitialbalance - recentMonthSumBalance));
+            var yeardate = monthlyTableName.Split('-');
+            return _moneyUsed.LoadMonthlySumPrice(yeardate[0], yeardate[1]);
+        }
+
+        /// <summary>
+        /// MonthlyFundテーブルに当月の月始残高を登録する
+        /// </summary>
+        /// <param name="price">月始残高</param>
+        public void InsertMonthlyFundRecord(decimal price)
+        {
+            _monthlyFund.InsertMonthlyFundRecord(NowYear, NowMonth, price);
         }
 
         /// <summary>

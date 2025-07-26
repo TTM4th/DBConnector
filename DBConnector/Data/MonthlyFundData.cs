@@ -40,7 +40,7 @@ namespace DBConnector.Data
         /// 最新月の月初残額を取得する
         /// </summary>
         /// <returns></returns>
-        public decimal LoadRecentMonthFirstPrice();
+        public decimal? LoadRecentMonthFirstPrice();
 
         /// <summary>
         /// MonthlyFundに引数で指定した年月の初日の残額情報を挿入する
@@ -113,10 +113,10 @@ namespace DBConnector.Data
         }
 
         /// <inheritdoc />
-        public decimal LoadRecentMonthFirstPrice()
+        public decimal? LoadRecentMonthFirstPrice()
         {
             var query = $" SELECT [Price] FROM[MonthlyFund] ORDER BY[MonthlyFund].ID DESC LIMIT 1";
-            return _db.Connection.ExecuteQueryWithValue<decimal>(query);
+            return _db.Connection.ExecuteQueryWithValue<decimal?>(query);
         }
 
         /// <inheritdoc />
