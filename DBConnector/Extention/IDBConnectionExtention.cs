@@ -44,7 +44,7 @@ namespace DBConnector.Extention
         /// </summary>
         /// <param name="connection">マップしたいクラス情報</param>
         /// <param name="query">クエリ</param>
-        /// <returns></returns>
+        /// <returns>実行結果がnullの場合はジェネリックのdefaultを返す</returns>
         public static outType ExecuteQueryWithValue<outType>(this SQLiteConnection connection, string query)
         {
             outType returnObj;
@@ -52,7 +52,14 @@ namespace DBConnector.Extention
             {
                 var selectCommand = new SQLiteCommand(query, connection);
                 connection.Open();
-                returnObj = (outType)Convert.ChangeType(selectCommand.ExecuteScalar(), typeof(outType));
+                if(selectCommand.ExecuteScalar() == null)
+                {
+                    returnObj = default(outType);
+                }
+                else
+                { 
+                    returnObj = (outType)Convert.ChangeType(selectCommand.ExecuteScalar(), typeof(outType));
+                }
             }
             return returnObj;
         }
