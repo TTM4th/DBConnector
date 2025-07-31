@@ -52,13 +52,15 @@ namespace DBConnector.Extention
             {
                 var selectCommand = new SQLiteCommand(query, connection);
                 connection.Open();
-                if(selectCommand.ExecuteScalar() == null)
+                var executeScalar = selectCommand.ExecuteScalar();
+                var targetType = Nullable.GetUnderlyingType(typeof(outType)) ?? typeof(outType);
+                if (executeScalar == null)
                 {
-                    returnObj = default(outType);
+                    returnObj = (outType)(targetType.IsValueType ? Activator.CreateInstance(targetType) : null);
                 }
                 else
-                { 
-                    returnObj = (outType)Convert.ChangeType(selectCommand.ExecuteScalar(), typeof(outType));
+                {
+                    returnObj = (outType)Convert.ChangeType(executeScalar, targetType);
                 }
             }
             return returnObj;

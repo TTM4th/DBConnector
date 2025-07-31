@@ -115,7 +115,7 @@ namespace DBConnector.Data
         /// <inheritdoc />
         public decimal? LoadRecentMonthFirstPrice()
         {
-            var query = $" SELECT [Price] FROM[MonthlyFund] ORDER BY[MonthlyFund].ID DESC LIMIT 1";
+            var query = $"SELECT [Price] FROM[MonthlyFund] ORDER BY[MonthlyFund].ID DESC LIMIT 1";
             return _db.Connection.ExecuteQueryWithValue<decimal?>(query);
         }
 
